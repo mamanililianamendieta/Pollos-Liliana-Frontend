@@ -334,7 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('close-success-modal-btn').addEventListener('click', () => {
              document.getElementById('success-modal').classList.remove('show');
-             document.querySelector('[data-page="inicio"]').click(); // Redirección PRO a inicio
+             // Redirigir al Menú para seguir comprando
+             document.querySelector('[data-page="menu"]').click();
+             renderCartPage(); // Actualiza el carrito para mostrar que está vacío
+             showNotification('🛒 Carrito limpio. ¡Listo para tu próximo pedido!', 'success');
         });
 
         // Utility for images
@@ -360,39 +363,45 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
 
             const { jsPDF } = window.jspdf;
-            // Roll receipt style: width 80mm, height 200mm
+
+            // ---- ALTUTA DINÁMICA según cantidad de ítems ----
+            const rowHeight = 6;       // mm por fila
+            const tableRows = lastOrder.length;
+            const headerH = 44;        // Cabecera + separadores
+            const footerH = 60;        // Total + QR (25mm) + pie de página
+            const dynamicHeight = headerH + (tableRows * rowHeight) + footerH;
+            const ticketHeight = Math.max(dynamicHeight, 80); // mínimo 80mm
+
             const doc = new jsPDF({
                 unit: 'mm',
-                format: [80, 200]
+                format: [80, ticketHeight]
             });
             
             // Fetch Images
             const logoBase64 = await getBase64ImageFromUrl('images/logo.png');
-            const qrText = encodeURIComponent(`Nro. Ticket L&G. Total: Bs ${lastTotal.toFixed(2)}`);
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrText}`;
+            const qrText = encodeURIComponent(`Ticket L&G | Total: Bs ${lastTotal.toFixed(2)} | ${lastOrder.length} items`);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}`;
             const qrBase64 = await getBase64ImageFromUrl(qrUrl);
 
-            // Draw Header Banner
-            doc.setFillColor(139, 0, 0); // Dark Red
-            doc.rect(0, 0, 80, 30, 'F');
-            
-            // Draw Logo (Centered at top)
+            // -- CABECERA ROJA --
+            doc.setFillColor(139, 0, 0);
+            doc.rect(0, 0, 80, 28, 'F');
             if(logoBase64) {
-                doc.addImage(logoBase64, 'PNG', 30, 2, 20, 20); // x=30 => centered 20px image on 80px canvas
+                doc.addImage(logoBase64, 'PNG', 30, 2, 18, 18);
             }
-
             doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(9);
             doc.text("POLLOS LILIANA & GLADIS", 40, 25, null, null, "center");
             
-            // Reset text color for body
+            // -- SUBTÍTULO --
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text("TICKET DE COMPRA VIP", 40, 35, null, null, "center");
-            doc.text("---------------------------------------------", 40, 39, null, null, "center");
-            
+            doc.setFontSize(7);
+            doc.text("TICKET DE COMPRA VIP", 40, 33, null, null, "center");
+            doc.text("- - - - - - - - - - - - - - - - - - - - - - -", 40, 37, null, null, "center");
+
+            // -- TABLA DE PRODUCTOS --
             const tableData = lastOrder.map(item => [
                 item.quantity.toString(),
                 item.name, 
@@ -400,42 +409,43 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
             
             doc.autoTable({
-                startY: 42,
-                head: [['Cant', 'Prods', 'Total']],
+                startY: 40,
+                head: [['Cant', 'Producto', 'Total']],
                 body: tableData,
                 theme: 'striped',
-                headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255] },
-                styles: { fontSize: 7, halign: 'center', cellPadding: 1 },
-                columnStyles: { 1: { halign: 'left' } },
-                margin: { left: 5, right: 5 }
+                headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255], fontSize: 7 },
+                styles: { fontSize: 7, halign: 'center', cellPadding: 1.5 },
+                columnStyles: { 1: { halign: 'left', cellWidth: 38 }, 0: { cellWidth: 12 }, 2: { cellWidth: 22 } },
+                margin: { left: 4, right: 4 }
             });
             
-            let finalY = doc.lastAutoTable.finalY || 42;
+            let finalY = doc.lastAutoTable.finalY || 40;
             
-            // Total
+            // -- TOTAL --
+            doc.setFillColor(240, 240, 240);
+            doc.rect(4, finalY + 3, 72, 8, 'F');
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.text(`TOTAL: Bs ${lastTotal.toFixed(2)}`, 75, finalY + 8, null, null, "right");
+            doc.setFontSize(9);
+            doc.setTextColor(139, 0, 0);
+            doc.text(`TOTAL: Bs ${lastTotal.toFixed(2)}`, 40, finalY + 8.5, null, null, "center");
+            doc.setTextColor(0, 0, 0);
             
-            // QR Code at center
+            // -- QR --
             if(qrBase64) {
-                doc.addImage(qrBase64, 'PNG', 27.5, finalY + 15, 25, 25);
+                doc.addImage(qrBase64, 'PNG', 28.5, finalY + 15, 23, 23);
             }
             
-            // Footer
+            // -- PIE DE PÁGINA --
             doc.setFont("helvetica", "italic");
-            doc.setFontSize(7);
-            doc.text("¡Gracias por su preferencia!", 40, finalY + 45, null, null, "center");
-            doc.text("Cuatro Cañadas | +591 63585285", 40, finalY + 49, null, null, "center");
+            doc.setFontSize(6.5);
+            doc.text("¡Gracias por su preferencia!", 40, finalY + 42, null, null, "center");
+            doc.text("Cuatro Cañadas | WhatsApp: +591 63585285", 40, finalY + 47, null, null, "center");
             
-            doc.save("Ticket_Profesional_L&G.pdf");
+            doc.save("Ticket_L&G.pdf");
             
             btn.textContent = "Imprimir Recibo PDF";
             btn.disabled = false;
-            
-            setTimeout(() => {
-                document.getElementById('close-success-modal-btn').click();
-            }, 500);
+            // No se cierra automáticamente — el usuario elige cuándo cerrar
         });
 
         // WhatsApp Checkout
@@ -456,9 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const phoneNumber = "59163585285"; // El número que usamos en las primeras etapas
             window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
             
-            setTimeout(() => {
-                document.getElementById('close-success-modal-btn').click();
-            }, 500);
+            // No se cierra automáticamente — el usuario elige cuándo cerrar
         });
     }
 
