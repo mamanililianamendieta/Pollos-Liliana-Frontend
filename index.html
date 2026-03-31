@@ -243,21 +243,41 @@
 
                 <!-- HISTORIAL DE ADMIN -->
                 <div class="sales-panel glass-container" style="margin-top: 2rem;">
-                    <div class="sales-header">
-                                <i class="fa-solid fa-clock-rotate-left"></i> Últimas 3 fechas
-                            </button>
+                    <div class="sales-header-tabs">
+                        <button id="tab-sales" class="tab-btn active"><i class="fa-solid fa-receipt"></i> Ventas</button>
+                        <button id="tab-res" class="tab-btn"><i class="fa-solid fa-calendar-check"></i> Reservas</button>
+                    </div>
+
+                    <div class="sales-controls">
+                        <div class="date-pickers">
+                            <label>Desde:</label>
+                            <input type="date" id="sales-from">
+                            <label>Hasta:</label>
+                            <input type="date" id="sales-to">
+                        </div>
+                        <div class="history-actions">
+                            <button id="sales-filter-btn" class="cta-button mini">Filtrar</button>
+                            <button id="sales-today-btn" class="cta-button mini secondary">Hoy</button>
+                            <button id="sales-all-btn" class="cta-button mini secondary">Últimos 3 días</button>
                         </div>
                     </div>
 
-                    <!-- Summary Cards -->
-                    <div id="sales-summary" class="sales-summary-cards"></div>
+                    <div id="sales-content">
+                        <!-- Summary Cards -->
+                        <div id="sales-summary" class="sales-summary-cards"></div>
+                        <!-- Detail -->
+                        <div id="sales-detail" class="sales-detail-list">
+                            <p style="text-align:center; color:#888; padding:2rem;">Cargando historial...</p>
+                        </div>
+                    </div>
 
-                    <!-- Detail Table -->
-                    <div id="sales-detail" class="sales-detail">
-                        <p style="text-align:center; color:#888; padding:2rem;">
-                            <i class="fa-solid fa-chart-bar" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
-                            Carga el historial usando los botones de arriba.
-                        </p>
+                    <div id="res-content" class="hidden">
+                        <!-- Summary Cards -->
+                        <div id="res-summary" class="sales-summary-cards"></div>
+                        <!-- Detail -->
+                        <div id="res-detail" class="sales-detail-list">
+                            <p style="text-align:center; color:#888; padding:2rem;">Cargando reservas...</p>
+                        </div>
                     </div>
                 </div>
             </section>

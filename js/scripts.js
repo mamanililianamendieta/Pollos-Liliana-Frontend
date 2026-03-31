@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastTotal = 0;
     let lastModalContext = 'order'; // 'order' | 'reservation'
     let lastReservation = {};
+    let reservationCart = []; // Current selection in the reservation form
     
     // Selectors
     const appContainer = document.getElementById('app-container');
@@ -104,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 menuItems = await res.json();
                 renderMenu();
+                renderReservationItems(); // Fill the selection grid in the reservation form
                 if(sessionStorage.getItem('adminToken')) renderAdminTable();
             } else {
                 showNotification('Error cargando el menú', 'error');
@@ -163,6 +165,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             menuGrid.appendChild(card);
+        });
+    }
+
+    // --- RESERVATION ITEMS GRID ---
+    function renderReservationItems() {
+        const grid = document.getElementById('reservation-items-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        menuItems.forEach(item => {
+            const isSelected = reservationCart.find(i => i.id === item.id);
+            const card = document.createElement('div');
+            card.className = `res-item-card ${isSelected ? 'selected' : ''}`;
+            card.innerHTML = `
+                <img src="${item.image}" alt="${item.name}" onerror="this.src='images/logo.png'">
+                <div class="res-item-info">
+                    <div class="res-item-name">${item.name}</div>
+                    <div class="res-item-price">Bs ${item.price.toFixed(2)}</div>
+                </div>
+                <div class="res-item-qty">
+                    ${isSelected ? `
+                        <div class="quantity-controls" style="padding:0; box-shadow:none;">
+                            <button class="quantity-btn res-minus" data-id="${item.id}">-</button>
+                            <span class="res-qty-val" style="min-width:14px;">${isSelected.quantity}</span>
+                            <button class="quantity-btn res-plus" data-id="${item.id}">+</button>
+                        </div>
+                    ` : `
+                        <button class="cta-button mini res-add" data-id="${item.id}"><i class="fa-solid fa-plus"></i></button>
+                    `}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        // Event listeners
+        grid.querySelectorAll('.res-add').forEach(btn => btn.onclick = (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const item = menuItems.find(i => i.id === id);
+            reservationCart.push({ ...item, quantity: 1 });
+            renderReservationItems();
+        });
+        grid.querySelectorAll('.res-plus').forEach(btn => btn.onclick = (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const item = reservationCart.find(i => i.id === id);
+            item.quantity++;
+            renderReservationItems();
+        });
+        grid.querySelectorAll('.res-minus').forEach(btn => btn.onclick = (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const idx = reservationCart.findIndex(i => i.id === id);
+            if(reservationCart[idx].quantity > 1) reservationCart[idx].quantity--;
+            else reservationCart.splice(idx, 1);
+            renderReservationItems();
         });
     }
 
@@ -295,20 +353,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupCartEvents() {
-        document.getElementById('reservation-form').addEventListener('submit', e => {
+        document.getElementById('reservation-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
-            lastReservation = {
+            const payload = {
                 name:   form.querySelector('#name').value,
                 date:   form.querySelector('#date').value,
                 time:   form.querySelector('#time').value,
-                guests: form.querySelector('#guests').value,
+                guests: parseInt(form.querySelector('#guests').value),
+                items:  reservationCart.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+                notes:  form.querySelector('#res-notes').value
             };
-            lastModalContext = 'reservation';
-            showModalExito('¡Reserva VIP Lista! 🎉', `Te esperamos el ${lastReservation.date} a las ${lastReservation.time}. ¡Mesa reservada para ${lastReservation.guests} persona(s)!`);
-            // Botones del modal según contexto
-            document.getElementById('generate-pdf-btn').textContent = '📄 Descargar Confirmación';
-            document.getElementById('whatsapp-btn').innerHTML = '<i class="fa-brands fa-whatsapp"></i> Avisar por WhatsApp';
+
+            showLoader();
+            try {
+                const res = await fetch(`${API_URL}/api/reservation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    lastReservation = { ...payload };
+                    lastModalContext = 'reservation';
+                    showModalExito('¡Reserva VIP Lista! 🎉', `Te esperamos el ${payload.date} a las ${payload.time}. Consumo en local pre-seleccionado.`);
+                    
+                    // Reset reservation state
+                    reservationCart = [];
+                    renderReservationItems();
+                    
+                    document.getElementById('generate-pdf-btn').textContent = '📄 Descargar Confirmación';
+                    document.getElementById('whatsapp-btn').innerHTML = '<i class="fa-brands fa-whatsapp"></i> Avisar por WhatsApp';
+                } else {
+                    showNotification('Error al registrar reserva', 'error');
+                }
+            } catch (err) {
+                showNotification('Error de conexión', 'error');
+            }
+            hideLoader();
         });
     }
 
@@ -369,6 +450,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             hideLoader();
         });
+
+        // Admin History Tabs
+        const tabSales = document.getElementById('tab-sales');
+        const tabRes = document.getElementById('tab-res');
+        const salesContent = document.getElementById('sales-content');
+        const resContent = document.getElementById('res-content');
+
+        if (tabSales && tabRes) {
+            tabSales.onclick = () => {
+                tabSales.classList.add('active'); tabRes.classList.remove('active');
+                salesContent.classList.remove('hidden'); resContent.classList.add('hidden');
+                loadSales();
+            };
+            tabRes.onclick = () => {
+                tabRes.classList.add('active'); tabSales.classList.remove('active');
+                resContent.classList.remove('hidden'); salesContent.classList.add('hidden');
+                loadReservations();
+            };
+        }
 
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -473,18 +573,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Datos
                 doc.setFontSize(8);
-                doc.setFont('helvetica', 'bold');   doc.text('Nombre:',  10, 47); doc.setFont('helvetica','normal'); doc.text(lastReservation.name,   38, 47);
-                doc.setFont('helvetica', 'bold');   doc.text('Fecha:',   10, 55); doc.setFont('helvetica','normal'); doc.text(lastReservation.date,   38, 55);
-                doc.setFont('helvetica', 'bold');   doc.text('Hora:',    10, 63); doc.setFont('helvetica','normal'); doc.text(lastReservation.time,   38, 63);
-                doc.setFont('helvetica', 'bold');   doc.text('Personas:', 10, 71); doc.setFont('helvetica','normal'); doc.text(String(lastReservation.guests), 38, 71);
+                doc.setFont('helvetica', 'bold');   doc.text('Nombre:',   10, 47); doc.setFont('helvetica','normal'); doc.text(lastReservation.name,   38, 47);
+                doc.setFont('helvetica', 'bold');   doc.text('Fecha:',    10, 53); doc.setFont('helvetica','normal'); doc.text(lastReservation.date,   38, 53);
+                doc.setFont('helvetica', 'bold');   doc.text('Hora:',     10, 59); doc.setFont('helvetica','normal'); doc.text(lastReservation.time,   38, 59);
+                doc.setFont('helvetica', 'bold');   doc.text('Personas:',  10, 65); doc.setFont('helvetica','normal'); doc.text(String(lastReservation.guests), 38, 65);
+
+                let nextY = 72;
+                if (lastReservation.items && lastReservation.items.length > 0) {
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+                    doc.text('PLATOS PRE-SELECCIONADOS:', 40, 72, null, null, 'center');
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+                    doc.text('- - - - - - - - - - - - - - - - - - - - - - -', 40, 76, null, null, 'center');
+                    
+                    const resItems = lastReservation.items.map(i => [i.quantity.toString(), i.name]);
+                    doc.autoTable({
+                        startY: 78,
+                        head: [['Cant', 'Producto']],
+                        body: resItems,
+                        theme: 'plain',
+                        headStyles: { fontStyle: 'bold', fontSize: 7, halign: 'center' },
+                        styles: { fontSize: 7, cellPadding: 1, halign: 'center' },
+                        columnStyles: { 0: { cellWidth: 10 }, 1: { halign: 'left' } },
+                        margin: { left: 8, right: 8 }
+                    });
+                    nextY = doc.lastAutoTable.finalY + 8;
+                }
 
                 // QR
-                if(qrBase64) doc.addImage(qrBase64, 'PNG', 28.5, 78, 23, 23);
+                if(qrBase64) doc.addImage(qrBase64, 'PNG', 28.5, nextY, 23, 23);
 
                 // Pie
                 doc.setFont('helvetica','italic'); doc.setFontSize(6.5);
-                doc.text('¡Gracias! Le esperamos con gusto.', 40, 106, null, null, 'center');
-                doc.text('Cuatro Cañadas | +591 63585285', 40, 111, null, null, 'center');
+                doc.text('¡Gracias! Le esperamos con gusto.', 40, nextY + 28, null, null, 'center');
+                doc.text('Cuatro Cañadas | +591 63585285', 40, nextY + 33, null, null, 'center');
 
                 doc.save('Reserva_Confirmacion_L&G.pdf');
                 btn.textContent = '📄 Descargar Confirmación';
@@ -602,8 +723,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 message += `👤 Nombre: *${lastReservation.name}*\n`;
                 message += `📅 Fecha: *${lastReservation.date}*\n`;
                 message += `⏰ Hora: *${lastReservation.time}*\n`;
-                message += `👥 Personas: *${lastReservation.guests}*\n\n`;
-                message += `¡Los esperamos! 🍗`;
+                message += `👥 Personas: *${lastReservation.guests}*\n`;
+                if (lastReservation.items && lastReservation.items.length > 0) {
+                    message += `\n🍴 *Pre-selección de consumo:* \n`;
+                    lastReservation.items.forEach(i => {
+                        message += `• ${i.quantity}x ${i.name}\n`;
+                    });
+                }
+                if (lastReservation.notes) message += `\n📝 Notas: ${lastReservation.notes}\n`;
+                message += `\n¡Los esperamos! 🍗`;
             }
 
             const encodedMessage = encodeURIComponent(message);
@@ -749,25 +877,111 @@ document.addEventListener('DOMContentLoaded', () => {
         detailEl.innerHTML = html;
     }
 
-    // Wiring sales buttons
+    // ──────────────────────────────────────────────────────────────
+    // REGISTRO DE RESERVAS (Admin)
+    // ──────────────────────────────────────────────────────────────
+    async function loadReservations(params = '') {
+        const token = sessionStorage.getItem('adminToken');
+        if (!token) return;
+        showLoader();
+        try {
+            const res = await fetch(`${API_URL}/api/reservations${params}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                renderReservations(data);
+            }
+        } catch (err) { console.error(err); }
+        hideLoader();
+    }
+
+    function renderReservations(resList) {
+        const summaryEl = document.getElementById('res-summary');
+        const detailEl  = document.getElementById('res-detail');
+
+        if (!resList || resList.length === 0) {
+            summaryEl.innerHTML = '';
+            detailEl.innerHTML = '<p style="text-align:center;color:#888;padding:2rem;">No hay reservas para el período seleccionado.</p>';
+            return;
+        }
+
+        const totalReservas = resList.length;
+        const totalPersonas = resList.reduce((s, r) => s + r.guests, 0);
+
+        summaryEl.innerHTML = `
+            <div class="sales-card blue">
+                <div class="card-val">${totalReservas}</div>
+                <div class="card-lbl">Total Reservas</div>
+            </div>
+            <div class="sales-card">
+                <div class="card-val">${totalPersonas}</div>
+                <div class="card-lbl">Total Comensales</div>
+            </div>
+        `;
+
+        // Group by visit date
+        const grouped = {};
+        resList.forEach(r => {
+            if (!grouped[r.visit_date]) grouped[r.visit_date] = [];
+            grouped[r.visit_date].push(r);
+        });
+
+        let html = '';
+        Object.keys(grouped).sort((a,b) => b.localeCompare(a)).forEach(date => {
+            const dayRes = grouped[date];
+            const formatted = new Date(date + 'T12:00:00').toLocaleDateString('es-BO', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+            html += `
+                <div class="sales-day-group">
+                    <h4>📅 ${formatted} &mdash; <strong>(${dayRes.length} reservas)</strong></h4>
+                    <table class="sales-table">
+                        <thead>
+                            <tr><th>Hora</th><th>Cliente</th><th>Pers.</th><th>Pre-selección</th></tr>
+                        </thead>
+                        <tbody>
+                            ${dayRes.map(r => `
+                                <tr>
+                                    <td>${r.visit_time}</td>
+                                    <td><strong>${r.guest_name}</strong></td>
+                                    <td>${r.guests}</td>
+                                    <td class="sale-items-mini">${r.items.length > 0 ? r.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'Ninguno'}</td>
+                                </tr>
+                                ${r.notes ? `<tr><td colspan="4" style="font-size:0.75rem; color:#666; border-top:none; padding-top:0;">📝 <em>${r.notes}</em></td></tr>` : ''}
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+        detailEl.innerHTML = html;
+    }
+
+    // Wiring sales buttons (context-aware for Sales or Reservations)
     document.getElementById('sales-today-btn')?.addEventListener('click', () => {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('sales-from').value = today;
         document.getElementById('sales-to').value = today;
-        loadSales(`?from=${today}&to=${today}`);
+        const activeTab = document.querySelector('.tab-btn.active').id;
+        if (activeTab === 'tab-sales') loadSales(`?from=${today}&to=${today}`);
+        else loadReservations(`?from=${today}&to=${today}`);
     });
 
     document.getElementById('sales-all-btn')?.addEventListener('click', () => {
         document.getElementById('sales-from').value = '';
         document.getElementById('sales-to').value = '';
-        loadSales(); // Returns last 3 dates by default
+        const activeTab = document.querySelector('.tab-btn.active').id;
+        if (activeTab === 'tab-sales') loadSales();
+        else loadReservations();
     });
 
     document.getElementById('sales-filter-btn')?.addEventListener('click', () => {
         const from = document.getElementById('sales-from').value;
         const to   = document.getElementById('sales-to').value;
         if (!from) { showNotification('Selecciona una fecha de inicio', 'error'); return; }
-        loadSales(`?from=${from}&to=${to || from}`);
+        const activeTab = document.querySelector('.tab-btn.active').id;
+        if (activeTab === 'tab-sales') loadSales(`?from=${from}&to=${to || from}`);
+        else loadReservations(`?from=${from}&to=${to || from}`);
     });
 
     initApp();
