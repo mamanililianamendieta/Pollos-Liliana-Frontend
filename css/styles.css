@@ -90,13 +90,13 @@ body {
 .mobile-nav-overlay.visible { display: block; }
 
 .mobile-nav {
-    position: fixed; top: 0; left: -280px; height: 100%;
-    width: 270px; background: var(--primary-gradient);
-    z-index: 1600; transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 1.5rem 1.2rem; box-shadow: 5px 0 20px rgba(0,0,0,0.3);
+    position: fixed; top: 0; right: -50%; height: 100%;
+    width: 50%; background: var(--primary-gradient);
+    z-index: 1600; transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 1.5rem 1.2rem; box-shadow: -5px 0 20px rgba(0,0,0,0.3);
     display: flex; flex-direction: column; gap: 0.3rem;
 }
-.mobile-nav.open { left: 0; }
+.mobile-nav.open { right: 0; }
 
 .mobile-nav-close {
     align-self: flex-end; background: rgba(255,255,255,0.15);
@@ -349,17 +349,18 @@ body {
 
 /* TABLET */
 @media (max-width: 768px) {
-    .main-header { padding: 0 1rem; height: 65px; }
-    .logo-container h2 { font-size: 1.4rem; }
+    .main-header { padding: 0 1rem; height: 65px; display: flex; justify-content: center; align-items: center; position: relative; }
+    .logo-container { position: absolute; left: 50%; transform: translateX(-50%); }
+    .logo-container h2 { font-size: 1.4rem; text-align: center; white-space: nowrap; }
     .main-nav { display: none; }           /* Oculta nav de escritorio */
-    .hamburger-btn { display: flex; }      /* Muestra botón ☰ */
+    .hamburger-btn { display: flex; position: absolute; right: 1rem; }      /* Muestra botón ☰ a la derecha */
     .title-bar { margin-top: 65px; }
     .main-content { padding: 1.5rem 1rem; }
     .hero { padding: 4rem 1.5rem; border-radius: 15px; }
     .hero h2 { font-size: 2rem; letter-spacing: 1px; }
     .hero p { font-size: 1.1rem; }
     .page h2 { font-size: 2rem; }
-    .card-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; }
+    .card-container { grid-template-columns: 1fr; gap: 1.2rem; } /* Forzado a FILAS (una por una) */
     .card-img { height: 220px; }
     .row { flex-direction: column; gap: 0; }
     .menu-controls { gap: 0.8rem; padding: 1rem !important; }
