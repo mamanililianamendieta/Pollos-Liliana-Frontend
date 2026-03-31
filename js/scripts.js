@@ -336,46 +336,101 @@ document.addEventListener('DOMContentLoaded', () => {
              document.getElementById('success-modal').classList.remove('show');
         });
 
+        // Utility for images
+        async function getBase64ImageFromUrl(imageUrl) {
+            try {
+                const res = await fetch(imageUrl);
+                const blob = await res.blob();
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            } catch(e) {
+                return null;
+            }
+        }
+
         // Generate PDF
-        document.getElementById('generate-pdf-btn')?.addEventListener('click', () => {
+        document.getElementById('generate-pdf-btn')?.addEventListener('click', async () => {
             if(!lastOrder || lastOrder.length === 0) return;
+            const btn = document.getElementById('generate-pdf-btn');
+            btn.textContent = "Generando Ticket...";
+            btn.disabled = true;
+
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            // Roll receipt style: width 80mm, height 200mm
+            const doc = new jsPDF({
+                unit: 'mm',
+                format: [80, 200]
+            });
             
+            // Fetch Images
+            const logoBase64 = await getBase64ImageFromUrl('images/logo.png');
+            const qrText = encodeURIComponent(`Nro. Ticket L&G. Total: Bs ${lastTotal.toFixed(2)}`);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrText}`;
+            const qrBase64 = await getBase64ImageFromUrl(qrUrl);
+
+            // Draw Header Banner
+            doc.setFillColor(139, 0, 0); // Dark Red
+            doc.rect(0, 0, 80, 30, 'F');
+            
+            // Draw Logo (Centered at top)
+            if(logoBase64) {
+                doc.addImage(logoBase64, 'PNG', 30, 2, 20, 20); // x=30 => centered 20px image on 80px canvas
+            }
+
+            doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(22);
-            doc.text("Pollos Liliana & Gladis", 105, 20, null, null, "center");
+            doc.setFontSize(9);
+            doc.text("POLLOS LILIANA & GLADIS", 40, 25, null, null, "center");
+            
+            // Reset text color for body
+            doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(12);
-            doc.text("Recibo de Compra Oficial VIP", 105, 30, null, null, "center");
+            doc.setFontSize(8);
+            doc.text("TICKET DE COMPRA VIP", 40, 35, null, null, "center");
+            doc.text("---------------------------------------------", 40, 39, null, null, "center");
             
             const tableData = lastOrder.map(item => [
+                item.quantity.toString(),
                 item.name, 
-                item.quantity.toString(), 
-                `Bs ${item.price.toFixed(2)}`, 
                 `Bs ${(item.price * item.quantity).toFixed(2)}`
             ]);
             
             doc.autoTable({
-                startY: 40,
-                head: [['Producto', 'Cantidad', 'Precio Unit.', 'Subtotal']],
+                startY: 42,
+                head: [['Cant', 'Prods', 'Total']],
                 body: tableData,
-                theme: 'grid',
-                headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255] }, // Dark red header
-                styles: { halign: 'center' },
-                columnStyles: { 0: { halign: 'left' } }
+                theme: 'striped',
+                headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255] },
+                styles: { fontSize: 7, halign: 'center', cellPadding: 1 },
+                columnStyles: { 1: { halign: 'left' } },
+                margin: { left: 5, right: 5 }
             });
             
-            let finalY = doc.lastAutoTable.finalY || 40;
+            let finalY = doc.lastAutoTable.finalY || 42;
+            
+            // Total
             doc.setFont("helvetica", "bold");
-            doc.text(`TOTAL A PAGAR: Bs ${lastTotal.toFixed(2)}`, 195, finalY + 15, null, null, "right");
-            
-            doc.setFont("helvetica", "italic");
             doc.setFontSize(10);
-            doc.text("¡Gracias por su preferencia! Le esperamos de vuelta.", 105, finalY + 35, null, null, "center");
-            doc.text("Cuatro Cañadas, Santa Cruz - Cel: 63585285", 105, finalY + 42, null, null, "center");
+            doc.text(`TOTAL: Bs ${lastTotal.toFixed(2)}`, 75, finalY + 8, null, null, "right");
             
-            doc.save("Recibo_Pollos_Liliana_Gladis.pdf");
+            // QR Code at center
+            if(qrBase64) {
+                doc.addImage(qrBase64, 'PNG', 27.5, finalY + 15, 25, 25);
+            }
+            
+            // Footer
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(7);
+            doc.text("¡Gracias por su preferencia!", 40, finalY + 45, null, null, "center");
+            doc.text("Cuatro Cañadas | +591 63585285", 40, finalY + 49, null, null, "center");
+            
+            doc.save("Ticket_Profesional_L&G.pdf");
+            
+            btn.textContent = "Imprimir Recibo PDF";
+            btn.disabled = false;
         });
 
         // WhatsApp Checkout
