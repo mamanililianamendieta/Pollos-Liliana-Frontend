@@ -1,41 +1,45 @@
-const CACHE_NAME = 'app-cache-v3';
+const CACHE_NAME = 'pollos-lg-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/instalacion/pwa.js',
-  '/instalacion/assets/icon-192.png',
-  '/instalacion/assets/icon-512.png'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/scripts.js',
+  './instalacion/assets/icon-192.png',
+  './instalacion/assets/icon-512.png'
 ];
 
+// Instalar el Service Worker
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[SW] Cache abierto');
-        return cache.addAll(urlsToCache.map(url => new Request(url, {cache: 'reload'})));
+        return cache.addAll(urlsToCache);
       })
-      .catch(err => console.error('[SW] Error al cachear:', err))
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
-});
-
+// Activar el Service Worker y limpiar caches viejos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== CACHE_NAME) {
-            console.log('[SW] Eliminando cache viejo:', cache);
-            return caches.delete(cache);
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
           }
         })
       );
     })
+  );
+});
+
+// Interceptar solicitudes
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        return response || fetch(event.request);
+      })
   );
 });
