@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let menuItems = []; 
     let cart = [];
+    let lastOrder = [];
+    let lastTotal = 0;
+    let lastModalContext = 'order'; // 'order' | 'reservation'
+    let lastReservation = {};
     
     // Selectors
     const appContainer = document.getElementById('app-container');
@@ -248,9 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- CHECKOUT ---
-    let lastOrder = [];
-    let lastTotal = 0;
-
     document.getElementById('checkout-btn').addEventListener('click', async () => {
         if(cart.length === 0) return;
         
@@ -266,8 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 lastOrder = [...cart];
                 lastTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                lastModalContext = 'order'; // Contexto: pedido
                 cart = [];
                 updateCartCounter();
+                // Restaurar textos de botones del modal al modo pedido
+                document.getElementById('generate-pdf-btn').textContent = 'Imprimir Recibo PDF';
+                document.getElementById('whatsapp-btn').innerHTML = '<i class="fa-brands fa-whatsapp"></i> Enviar a WhatsApp';
                 showModalExito('¡Pedido Exitoso!', 'Se descontaron los artículos de nuestro inventario (Base de Datos). Te esperamos.');
                 await loadProducts(); // recargar
             } else {
@@ -292,8 +297,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupCartEvents() {
         document.getElementById('reservation-form').addEventListener('submit', e => {
             e.preventDefault();
-            showModalExito('¡Reserva VIP Lista!', 'Te esperamos a la hora acordada.');
-            e.target.reset();
+            const form = e.target;
+            lastReservation = {
+                name:   form.querySelector('#name').value,
+                date:   form.querySelector('#date').value,
+                time:   form.querySelector('#time').value,
+                guests: form.querySelector('#guests').value,
+            };
+            lastModalContext = 'reservation';
+            showModalExito('¡Reserva VIP Lista! 🎉', `Te esperamos el ${lastReservation.date} a las ${lastReservation.time}. ¡Mesa reservada para ${lastReservation.guests} persona(s)!`);
+            // Botones del modal según contexto
+            document.getElementById('generate-pdf-btn').textContent = '📄 Descargar Confirmación';
+            document.getElementById('whatsapp-btn').innerHTML = '<i class="fa-brands fa-whatsapp"></i> Avisar por WhatsApp';
         });
     }
 
@@ -390,11 +405,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         document.getElementById('close-success-modal-btn').addEventListener('click', () => {
-             document.getElementById('success-modal').classList.remove('show');
-             // Redirigir al Menú para seguir comprando y borrar contador
-             document.querySelector('[data-page="menu"]').click();
-             updateCartCounter(); // Borra el número del carrito en el nav
-             showNotification('✅ ¡Pedido completado! Carrito limpio.', 'success');
+            document.getElementById('success-modal').classList.remove('show');
+            if (lastModalContext === 'reservation') {
+                // Quedarse en Reservas, limpiar formulario
+                document.getElementById('reservation-form').reset();
+                document.querySelector('[data-page="reservas"]').click();
+                showNotification('🗓️ Reserva confirmada. ¡Hasta pronto!', 'success');
+            } else {
+                // Pedido: ir al carrito y limpiarlo visualmente
+                document.querySelector('[data-page="pedido"]').click();
+                updateCartCounter();
+                showNotification('✅ ¡Pedido completado! Carrito limpio.', 'success');
+                // Restaurar texto del botón PDF
+                document.getElementById('generate-pdf-btn').textContent = 'Imprimir Recibo PDF';
+                document.getElementById('whatsapp-btn').innerHTML = '<i class="fa-brands fa-whatsapp"></i> Enviar a WhatsApp';
+            }
         });
 
         // Utility for images
@@ -412,12 +437,64 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Generate PDF
+        // Generate PDF (context-aware: order OR reservation)
         document.getElementById('generate-pdf-btn')?.addEventListener('click', async () => {
-            if(!lastOrder || lastOrder.length === 0) return;
             const btn = document.getElementById('generate-pdf-btn');
-            btn.textContent = "Generando Ticket...";
+            btn.textContent = "Generando...";
             btn.disabled = true;
+
+            // --- PDF DE RESERVA ---
+            if (lastModalContext === 'reservation') {
+                const { jsPDF } = window.jspdf;
+                const logoBase64 = await getBase64ImageFromUrl('images/logo.png');
+                const qrText = encodeURIComponent(`Reserva L&G | ${lastReservation.name} | ${lastReservation.date} ${lastReservation.time}`);
+                const qrUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}`;
+                const qrBase64 = await getBase64ImageFromUrl(qrUrl);
+
+                const doc = new jsPDF({ unit: 'mm', format: [80, 130] });
+
+                // Cabecera roja
+                doc.setFillColor(139, 0, 0);
+                doc.rect(0, 0, 80, 28, 'F');
+                if(logoBase64) doc.addImage(logoBase64, 'PNG', 30, 2, 18, 18);
+                doc.setTextColor(255, 255, 255);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.text('POLLOS LILIANA & GLADIS', 40, 25, null, null, 'center');
+
+                // Título
+                doc.setTextColor(0,0,0);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text('CONFIRMACIÓN DE RESERVA', 40, 35, null, null, 'center');
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.text('- - - - - - - - - - - - - - - - - - - - - - -', 40, 39, null, null, 'center');
+
+                // Datos
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');   doc.text('Nombre:',  10, 47); doc.setFont('helvetica','normal'); doc.text(lastReservation.name,   38, 47);
+                doc.setFont('helvetica', 'bold');   doc.text('Fecha:',   10, 55); doc.setFont('helvetica','normal'); doc.text(lastReservation.date,   38, 55);
+                doc.setFont('helvetica', 'bold');   doc.text('Hora:',    10, 63); doc.setFont('helvetica','normal'); doc.text(lastReservation.time,   38, 63);
+                doc.setFont('helvetica', 'bold');   doc.text('Personas:', 10, 71); doc.setFont('helvetica','normal'); doc.text(String(lastReservation.guests), 38, 71);
+
+                // QR
+                if(qrBase64) doc.addImage(qrBase64, 'PNG', 28.5, 78, 23, 23);
+
+                // Pie
+                doc.setFont('helvetica','italic'); doc.setFontSize(6.5);
+                doc.text('¡Gracias! Le esperamos con gusto.', 40, 106, null, null, 'center');
+                doc.text('Cuatro Cañadas | +591 63585285', 40, 111, null, null, 'center');
+
+                doc.save('Reserva_Confirmacion_L&G.pdf');
+                btn.textContent = '📄 Descargar Confirmación';
+                btn.disabled = false;
+                return;
+            }
+
+            // --- PDF DE PEDIDO (ticket) ---
+            if(!lastOrder || lastOrder.length === 0) { btn.textContent = 'Imprimir Recibo PDF'; btn.disabled = false; return; }
+            btn.textContent = "Generando Ticket...";
 
             const { jsPDF } = window.jspdf;
 
@@ -509,21 +586,30 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('whatsapp-btn')?.addEventListener('click', () => {
             if(!lastOrder || lastOrder.length === 0) return;
             
+            // WhatsApp de PEDIDO
             let message = "🍗 *NUEVO PEDIDO - POLLOS LILIANA & GLADIS* 🍗\n\n";
             message += "Hola, acabo de realizar este pedido en la web:\n";
-            
             lastOrder.forEach(item => {
                 message += `👉 ${item.quantity}x ${item.name} (- Bs ${(item.price * item.quantity).toFixed(2)})\n`;
             });
-            
             message += `\n💵 *TOTAL COMPRA: Bs ${lastTotal.toFixed(2)}*\n\n`;
             message += "¡Muchas gracias! Ya descargué mi recibo también.";
-            
+
+            // Si es reserva, cambiar mensaje
+            if (lastModalContext === 'reservation') {
+                message  = `🗓️ *NUEVA RESERVA - POLLOS LILIANA & GLADIS* 🗓️\n\n`;
+                message += `Hola, me gustaría confirmar mi reserva:\n`;
+                message += `👤 Nombre: *${lastReservation.name}*\n`;
+                message += `📅 Fecha: *${lastReservation.date}*\n`;
+                message += `⏰ Hora: *${lastReservation.time}*\n`;
+                message += `👥 Personas: *${lastReservation.guests}*\n\n`;
+                message += `¡Los esperamos! 🍗`;
+            }
+
             const encodedMessage = encodeURIComponent(message);
-            const phoneNumber = "59163585285"; // El número que usamos en las primeras etapas
+            const phoneNumber = "59163585285";
             window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
-            
-            // No se cierra automáticamente — el usuario elige cuándo cerrar
+            // El modal NO se cierra automáticamente
         });
     }
 
