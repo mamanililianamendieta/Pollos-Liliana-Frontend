@@ -191,6 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- CHECKOUT ---
+    let lastOrder = [];
+    let lastTotal = 0;
+
     document.getElementById('checkout-btn').addEventListener('click', async () => {
         if(cart.length === 0) return;
         
@@ -204,6 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             if (res.ok) {
+                lastOrder = [...cart];
+                lastTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
                 cart = [];
                 updateCartCounter();
                 showModalExito('¡Pedido Exitoso!', 'Se descontaron los artículos de nuestro inventario (Base de Datos). Te esperamos.');
@@ -329,6 +334,48 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('close-success-modal-btn').addEventListener('click', () => {
              document.getElementById('success-modal').classList.remove('show');
+        });
+
+        // Generate PDF
+        document.getElementById('generate-pdf-btn')?.addEventListener('click', () => {
+            if(!lastOrder || lastOrder.length === 0) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("Pollos Liliana & Gladis", 105, 20, null, null, "center");
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.text("Recibo de Compra Oficial VIP", 105, 30, null, null, "center");
+            
+            const tableData = lastOrder.map(item => [
+                item.name, 
+                item.quantity.toString(), 
+                `Bs ${item.price.toFixed(2)}`, 
+                `Bs ${(item.price * item.quantity).toFixed(2)}`
+            ]);
+            
+            doc.autoTable({
+                startY: 40,
+                head: [['Producto', 'Cantidad', 'Precio Unit.', 'Subtotal']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255] }, // Dark red header
+                styles: { halign: 'center' },
+                columnStyles: { 0: { halign: 'left' } }
+            });
+            
+            let finalY = doc.lastAutoTable.finalY || 40;
+            doc.setFont("helvetica", "bold");
+            doc.text(`TOTAL A PAGAR: Bs ${lastTotal.toFixed(2)}`, 195, finalY + 15, null, null, "right");
+            
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(10);
+            doc.text("¡Gracias por su preferencia! Le esperamos de vuelta.", 105, finalY + 35, null, null, "center");
+            doc.text("Cuatro Cañadas, Santa Cruz - Cel: 63585285", 105, finalY + 42, null, null, "center");
+            
+            doc.save("Recibo_Pollos_Liliana_Gladis.pdf");
         });
     }
 
