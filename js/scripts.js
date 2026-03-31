@@ -377,6 +377,25 @@ document.addEventListener('DOMContentLoaded', () => {
             
             doc.save("Recibo_Pollos_Liliana_Gladis.pdf");
         });
+
+        // WhatsApp Checkout
+        document.getElementById('whatsapp-btn')?.addEventListener('click', () => {
+            if(!lastOrder || lastOrder.length === 0) return;
+            
+            let message = "🍗 *NUEVO PEDIDO - POLLOS LILIANA & GLADIS* 🍗\n\n";
+            message += "Hola, acabo de realizar este pedido en la web:\n";
+            
+            lastOrder.forEach(item => {
+                message += `👉 ${item.quantity}x ${item.name} (- Bs ${(item.price * item.quantity).toFixed(2)})\n`;
+            });
+            
+            message += `\n💵 *TOTAL COMPRA: Bs ${lastTotal.toFixed(2)}*\n\n`;
+            message += "¡Muchas gracias! Ya descargué mi recibo también.";
+            
+            const encodedMessage = encodeURIComponent(message);
+            const phoneNumber = "59163585285"; // El número que usamos en las primeras etapas
+            window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
+        });
     }
 
     // --- ADMIN DASHBOARD ---
