@@ -334,10 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('close-success-modal-btn').addEventListener('click', () => {
              document.getElementById('success-modal').classList.remove('show');
-             // Redirigir al Menú para seguir comprando
+             // Redirigir al Menú para seguir comprando y borrar contador
              document.querySelector('[data-page="menu"]').click();
-             renderCartPage(); // Actualiza el carrito para mostrar que está vacío
-             showNotification('🛒 Carrito limpio. ¡Listo para tu próximo pedido!', 'success');
+             updateCartCounter(); // Borra el número del carrito en el nav
+             showNotification('✅ ¡Pedido completado! Carrito limpio.', 'success');
         });
 
         // Utility for images
@@ -445,7 +445,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             btn.textContent = "Imprimir Recibo PDF";
             btn.disabled = false;
-            // No se cierra automáticamente — el usuario elige cuándo cerrar
+
+            // Auto-cierre tras 1.5s y va al Carrito para ver el resumen
+            setTimeout(() => {
+                document.getElementById('success-modal').classList.remove('show');
+                document.querySelector('[data-page="pedido"]').click();
+                updateCartCounter(); // Limpia el contador en el nav
+            }, 1500);
         });
 
         // WhatsApp Checkout
