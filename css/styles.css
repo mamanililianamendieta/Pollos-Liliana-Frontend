@@ -201,13 +201,78 @@ body {
 .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+/* ============================================
+   RESPONSIVE DESIGN - TABLET & MOBILE
+   ============================================ */
+
 @media (max-width: 992px) {
     .admin-grid { grid-template-columns: 1fr; }
     .hero h2 { font-size: 2.5rem; }
+    .card-container { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+    .main-content { padding: 2rem; }
 }
+
+/* TABLET */
 @media (max-width: 768px) {
-    .main-header { padding: 0 1.5rem; }
-    .main-nav span { display: none; }
+    .main-header { padding: 0 1rem; height: 65px; }
+    .logo-container h2 { font-size: 1.4rem; }
+    .main-nav { gap: 0.5rem; }
+    .nav-link span { display: none; }
+    .nav-link { padding: 0.4rem 0.6rem; font-size: 0.9rem; }
+    .title-bar { margin-top: 65px; }
+    .main-content { padding: 1.5rem 1rem; }
+    .hero { padding: 4rem 1.5rem; border-radius: 15px; }
+    .hero h2 { font-size: 2rem; letter-spacing: 1px; }
+    .hero p { font-size: 1.1rem; }
+    .page h2 { font-size: 2rem; }
+    .card-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; }
+    .card-img { height: 220px; }
     .row { flex-direction: column; gap: 0; }
-    .inventory-table { display: block; overflow-x: auto; }
+    .menu-controls { gap: 0.8rem; padding: 1rem !important; }
+    .custom-select { min-width: 100%; }
+    .cart-item { gap: 0.8rem; padding: 1rem; }
+    .cart-item-img { width: 65px; height: 65px; }
+    .cart-item-title { font-size: 1rem; }
+    #cart-total-section { font-size: 1.4rem; }
+    .inventory-table { display: block; overflow-x: auto; font-size: 0.85rem; }
+    .edit-input { width: 55px; padding: 0.3rem; }
+    .modal-content { padding: 2rem 1.5rem; width: 95%; }
+    .login-box h3 { font-size: 1.5rem; }
+}
+
+/* MOBILE */
+@media (max-width: 480px) {
+    .main-header { padding: 0 0.8rem; height: 60px; }
+    .logo-container h2 { font-size: 1.2rem; }
+    .nav-link { padding: 0.3rem 0.5rem; }
+    .title-bar { margin-top: 60px; font-size: 0.9rem; }
+    .marquee-container span { font-size: 0.9rem; }
+    .main-content { padding: 1rem 0.8rem; }
+    .hero { padding: 3rem 1rem; border-radius: 12px; margin-bottom: 1.5rem; }
+    .hero h2 { font-size: 1.5rem; }
+    .hero p { font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .cta-button { padding: 0.8rem 1.8rem; font-size: 0.95rem; }
+    .page h2 { font-size: 1.6rem; margin-bottom: 1.2rem; }
+    .card-container { grid-template-columns: 1fr; gap: 1rem; }
+    .card-img { height: 200px; }
+    .card-title { font-size: 1.3rem; }
+    .cart-item { flex-wrap: wrap; }
+    .cart-item-img { width: 55px; height: 55px; }
+    #cart-total-section { font-size: 1.2rem; }
+    .modal-content {
+        width: 98%;
+        padding: 1.5rem 1rem;
+        border-radius: 15px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    #whatsapp-btn, #generate-pdf-btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+    .admin-grid { gap: 1rem; }
+    .glass-container { padding: 1.2rem; }
+    .pie-de-pagina { padding: 2rem 1rem 1.5rem; border-top-left-radius: 30px; border-top-right-radius: 30px; }
+    .footer-content h3 { font-size: 1.4rem; }
+    .social-icons a { font-size: 1.8rem; margin: 0 0.5rem; }
 }
