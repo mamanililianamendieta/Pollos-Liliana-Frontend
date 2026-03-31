@@ -334,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('close-success-modal-btn').addEventListener('click', () => {
              document.getElementById('success-modal').classList.remove('show');
+             document.querySelector('[data-page="inicio"]').click(); // Redirección PRO a inicio
         });
 
         // Utility for images
@@ -431,6 +432,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             btn.textContent = "Imprimir Recibo PDF";
             btn.disabled = false;
+            
+            setTimeout(() => {
+                document.getElementById('close-success-modal-btn').click();
+            }, 500);
         });
 
         // WhatsApp Checkout
@@ -450,6 +455,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const encodedMessage = encodeURIComponent(message);
             const phoneNumber = "59163585285"; // El número que usamos en las primeras etapas
             window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
+            
+            setTimeout(() => {
+                document.getElementById('close-success-modal-btn').click();
+            }, 500);
         });
     }
 
