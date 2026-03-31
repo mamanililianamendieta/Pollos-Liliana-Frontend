@@ -20,7 +20,7 @@
             <div class="logo-container">
                 <h2>🍗 L&G</h2>
             </div>
-            <nav class="main-nav">
+            <nav class="main-nav" id="main-nav">
                 <a href="#" class="nav-link active" data-page="inicio">Inicio</a>
                 <a href="#" class="nav-link" data-page="menu">Menú</a>
                 <a href="#" class="nav-link" data-page="pedido"><i class="fa-solid fa-cart-shopping"></i> <span id="cart-counter">0</span></a>
@@ -32,7 +32,25 @@
                 <a href="#" id="open-admin-login" class="nav-link icon-btn" title="Acceso Administrativo"><i class="fa-solid fa-user-lock"></i></a>
                 <a href="#" id="logout-btn" class="nav-link icon-btn hidden" title="Cerrar Sesión"><i class="fa-solid fa-right-from-bracket"></i></a>
             </nav>
+            <!-- Hamburger button (visible only on mobile) -->
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
         </header>
+
+        <!-- MOBILE MENU OVERLAY -->
+        <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <button class="mobile-nav-close" id="mobile-nav-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="mobile-nav-logo">🍗 Pollos L&G</div>
+            <a href="#" class="mobile-nav-link" data-page="inicio"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="#" class="mobile-nav-link" data-page="menu"><i class="fa-solid fa-utensils"></i> Menú</a>
+            <a href="#" class="mobile-nav-link" data-page="pedido"><i class="fa-solid fa-cart-shopping"></i> Carrito <span id="mobile-cart-counter" class="mobile-counter">0</span></a>
+            <a href="#" class="mobile-nav-link" data-page="reservas"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+            <a href="#" class="mobile-nav-link admin-nav hidden" data-page="admin"><i class="fa-solid fa-gauge-high"></i> Panel Admin</a>
+            <a href="#" id="mobile-open-admin-login" class="mobile-nav-link"><i class="fa-solid fa-user-lock"></i> Acceso Admin</a>
+            <a href="#" id="mobile-logout-btn" class="mobile-nav-link hidden" style="color:#e53935;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a>
+        </nav>
         
         <div class="title-bar">
             <div class="marquee-container"><span>🔥 El Mejor Sabor de Cuatro Cañadas 🔥 &nbsp;&nbsp;&nbsp;&nbsp; Calidad Premium 100% Fresca &nbsp;&nbsp;&nbsp;&nbsp; ¡Te esperamos en Pollos Liliana & Gladis! &nbsp;&nbsp;&nbsp;&nbsp;</span></div>
@@ -208,6 +226,39 @@
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- HISTORIAL DE VENTAS -->
+                <div class="sales-panel glass-container" style="margin-top: 2rem;">
+                    <div class="sales-header">
+                        <h3><i class="fa-solid fa-chart-line"></i> Historial de Ventas</h3>
+                        <div class="sales-filters">
+                            <label>Desde:</label>
+                            <input type="date" id="sales-from" class="date-input">
+                            <label>Hasta:</label>
+                            <input type="date" id="sales-to" class="date-input">
+                            <button id="sales-filter-btn" class="cta-button" style="padding:0.5rem 1rem; font-size:0.85rem;">
+                                <i class="fa-solid fa-filter"></i> Filtrar
+                            </button>
+                            <button id="sales-today-btn" class="save-btn" style="padding:0.5rem 1rem;">
+                                <i class="fa-solid fa-calendar-day"></i> Hoy
+                            </button>
+                            <button id="sales-all-btn" class="save-btn" style="padding:0.5rem 1rem; background:#1565c0;">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Últimas 3 fechas
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div id="sales-summary" class="sales-summary-cards"></div>
+
+                    <!-- Detail Table -->
+                    <div id="sales-detail" class="sales-detail">
+                        <p style="text-align:center; color:#888; padding:2rem;">
+                            <i class="fa-solid fa-chart-bar" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
+                            Carga el historial usando los botones de arriba.
+                        </p>
                     </div>
                 </div>
             </section>

@@ -445,13 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             btn.textContent = "Imprimir Recibo PDF";
             btn.disabled = false;
-
-            // Auto-cierre tras 1.5s y va al Carrito para ver el resumen
-            setTimeout(() => {
-                document.getElementById('success-modal').classList.remove('show');
-                document.querySelector('[data-page="pedido"]').click();
-                updateCartCounter(); // Limpia el contador en el nav
-            }, 1500);
+            // El modal NO se cierra automáticamente — el usuario decide cuándo cerrar
         });
 
         // WhatsApp Checkout
@@ -519,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showNotification(msg, type='success') {
         const el = document.getElementById('notification');
         el.textContent = msg;
-        el.style.background = type === 'error' ? 'rgba(211, 47, 47, 0.9.5)' : 'rgba(76, 175, 80, 0.95)';
+        el.style.background = type === 'error' ? 'rgba(211, 47, 47, 0.95)' : 'rgba(76, 175, 80, 0.95)';
         el.classList.add('show');
         setTimeout(() => el.classList.remove('show'), 3000);
     }
@@ -529,6 +523,109 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('success-modal-message').textContent = msg;
         document.getElementById('success-modal').classList.add('show');
     }
+
+    // ──────────────────────────────────────────────────────────────
+    // HISTORIAL DE VENTAS
+    // ──────────────────────────────────────────────────────────────
+    async function loadSales(params = '') {
+        const token = sessionStorage.getItem('adminToken');
+        if (!token) return;
+        const res = await fetch(`${API_URL}/api/sales${params}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) return;
+        const sales = await res.json();
+        renderSales(sales);
+    }
+
+    function renderSales(sales) {
+        const summaryEl = document.getElementById('sales-summary');
+        const detailEl  = document.getElementById('sales-detail');
+
+        if (!sales || sales.length === 0) {
+            summaryEl.innerHTML = '';
+            detailEl.innerHTML = '<p style="text-align:center;color:#888;padding:2rem;">No hay ventas para el período seleccionado.</p>';
+            return;
+        }
+
+        // Summary stats
+        const totalIngresos = sales.reduce((s, v) => s + v.total, 0);
+        const totalPedidos  = sales.length;
+        const fechasSet = new Set(sales.map(v => v.sale_date));
+        const diasConVentas = fechasSet.size;
+
+        summaryEl.innerHTML = `
+            <div class="sales-card">
+                <div class="card-val">Bs ${totalIngresos.toFixed(2)}</div>
+                <div class="card-lbl">Total Ingresos</div>
+            </div>
+            <div class="sales-card green">
+                <div class="card-val">${totalPedidos}</div>
+                <div class="card-lbl">Pedidos Realizados</div>
+            </div>
+            <div class="sales-card blue">
+                <div class="card-val">${diasConVentas}</div>
+                <div class="card-lbl">${diasConVentas === 1 ? 'Día' : 'Días'} con Ventas</div>
+            </div>
+        `;
+
+        // Group by date
+        const grouped = {};
+        sales.forEach(sale => {
+            if (!grouped[sale.sale_date]) grouped[sale.sale_date] = [];
+            grouped[sale.sale_date].push(sale);
+        });
+
+        let html = '';
+        Object.keys(grouped).sort((a,b) => b.localeCompare(a)).forEach(date => {
+            const daySales  = grouped[date];
+            const dayTotal  = daySales.reduce((s, v) => s + v.total, 0);
+            const formatted = new Date(date + 'T12:00:00').toLocaleDateString('es-BO', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+            html += `
+                <div class="sales-day-group">
+                    <h4>📅 ${formatted} &mdash; <strong>Total del día: Bs ${dayTotal.toFixed(2)}</strong></h4>
+                    <table class="sales-table">
+                        <thead>
+                            <tr><th>Hora</th><th>Productos</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>
+                            ${daySales.map(s => `
+                                <tr>
+                                    <td>${s.sale_time}</td>
+                                    <td class="sale-items-mini">${s.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
+                                    <td><strong>Bs ${s.total.toFixed(2)}</strong></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+
+        detailEl.innerHTML = html;
+    }
+
+    // Wiring sales buttons
+    document.getElementById('sales-today-btn')?.addEventListener('click', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('sales-from').value = today;
+        document.getElementById('sales-to').value = today;
+        loadSales(`?from=${today}&to=${today}`);
+    });
+
+    document.getElementById('sales-all-btn')?.addEventListener('click', () => {
+        document.getElementById('sales-from').value = '';
+        document.getElementById('sales-to').value = '';
+        loadSales(); // Returns last 3 dates by default
+    });
+
+    document.getElementById('sales-filter-btn')?.addEventListener('click', () => {
+        const from = document.getElementById('sales-from').value;
+        const to   = document.getElementById('sales-to').value;
+        if (!from) { showNotification('Selecciona una fecha de inicio', 'error'); return; }
+        loadSales(`?from=${from}&to=${to || from}`);
+    });
 
     initApp();
 });
