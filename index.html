@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <title>Pollos Liliana & Gladis</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="instalacion/manifest.json">
+</head>
+<body>
+
+    <div id="app-container" class="app-container">
+        <!-- HEADER GLASSMORPHISM -->
+        <header class="main-header">
+            <div class="logo-container">
+                <h2>🍗 L&G</h2>
+            </div>
+            <nav class="main-nav">
+                <a href="#" class="nav-link active" data-page="inicio">Inicio</a>
+                <a href="#" class="nav-link" data-page="menu">Menú</a>
+                <a href="#" class="nav-link" data-page="pedido"><i class="fa-solid fa-cart-shopping"></i> <span id="cart-counter">0</span></a>
+                <a href="#" class="nav-link" data-page="reservas">Reservas</a>
+                
+                <!-- Oculto a menos que seas admin o para abrir login admin -->
+                <a href="#" class="nav-link admin-nav hidden" data-page="admin"> <i class="fa-solid fa-gauge-high"></i> Panel Admin</a>
+                
+                <a href="#" id="open-admin-login" class="nav-link icon-btn" title="Acceso Administrativo"><i class="fa-solid fa-user-lock"></i></a>
+                <a href="#" id="logout-btn" class="nav-link icon-btn hidden" title="Cerrar Sesión"><i class="fa-solid fa-right-from-bracket"></i></a>
+            </nav>
+        </header>
+        
+        <div class="title-bar">
+            <div class="marquee-container"><span>🔥 El Mejor Sabor de Cuatro Cañadas 🔥 &nbsp;&nbsp;&nbsp;&nbsp; Calidad Premium 100% Fresca &nbsp;&nbsp;&nbsp;&nbsp; ¡Te esperamos en Pollos Liliana & Gladis! &nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+        </div>
+
+        <main class="main-content">
+            <!-- INICIO -->
+            <section id="inicio" class="page active">
+                <div class="hero">
+                    <h2>Descubre el Auténtico Sabor</h2><br>
+                    <p>Ingredientes frescos, recetas explosivas y ambiente inigualable.</p><br>
+                    <a href="#" class="cta-button" data-page="menu">Ordenar Ahora</a>
+                </div>
+                
+                <div id="chefs" class="page-section">
+                    <h2>Nuestras Maestras del Sabor</h2>
+                    <div class="card-container">
+                        <div class="card premium-card">
+                            <img src="images/liliana.png" alt="Liliana" class="card-img">
+                            <div class="card-body">
+                                <h3 class="card-title">Liliana Mamani Mendieta</h3>
+                                <p class="card-text">Especialista en la preparación de hamburguesas y lomitos con un sazón inigualable que deleita a toda la comunidad.</p>
+                            </div>
+                        </div>
+                        <div class="card premium-card">
+                            <img src="images/gladis.png" alt="Gladis" class="card-img">
+                            <div class="card-body">
+                                <h3 class="card-title">Gladis Mamani Mendieta</h3>
+                                <p class="card-text">La experta en el pollo crujiente y frituras doradas. Asegurando que cada bocado mantenga la calidad que nos caracteriza.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ubicacion" class="page-section">
+                    <h2>Encuéntranos en Cuatro Cañadas</h2>
+                    <div class="map-container glass-container">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15211.756317255147!2d-62.56586045!3d-17.26257545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9394626154388405%3A0x6a21350849202158!2sCuatro%20Ca%C3%B1adas!5e0!3m2!1ses!2sbo!4v1711411200000!5m2!1ses!2sbo" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+
+                <footer class="pie-de-pagina">
+                    <div class="footer-content">
+                        <h3>Pollos Liliana & Gladis</h3>
+                        <p>📍 Cuatro Cañadas, Santa Cruz</p>
+                        <p>Teléfono: +591 63585285</p>
+                        <div class="social-icons">
+                           <a href="https://wa.me/59163585285?text=Hola,%20quiero%20hacer%20un%20pedido." target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>                        
+                           <a href="#" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                        </div>
+                    </div>
+                    <p class="copyright">&copy; 2026 Diseñado con ♥ Estilo Premium.</p>
+                </footer>
+            </section>
+
+            <!-- MENU GENERAL PÚBLICO -->
+            <section id="menu" class="page">
+                <h2>Menú Premium</h2>
+                <div class="menu-controls glass-container">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="search-input" placeholder="Buscar tu antojo...">
+                    </div>
+                    <select id="category-filter" class="custom-select">
+                        <option value="all">Todo Nuestro Sabor</option>
+                        <option value="hamburguesas">Hamburguesas🍔</option>
+                        <option value="lomitos">Lomitos🥩</option>
+                        <option value="pollos">Pollos🍗</option>
+                        <option value="sodas">Sodas🥤</option>
+                        <option value="refrescos">Refrescos🍹</option>
+                    </select>
+                </div>
+                <div id="loader" class="loader" style="display:none;"><div class="spinner"></div></div>
+                <div id="menu-grid" class="card-container"></div>
+            </section>
+
+            <!-- CARRITO Y PEDIDO -->
+            <section id="pedido" class="page">
+                <h2>Tu Pedido</h2>
+                <div id="cart-container" class="glass-container">
+                    <div id="cart-items-list"></div>
+                    <div id="cart-total-section">
+                        <p>Subtotal: <span id="cart-total-price">Bs 0.00</span></p>
+                        <button id="checkout-btn" class="cta-button">Proceder al Pago <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RESERVAS -->
+            <section id="reservas" class="page">
+                <h2>Reserva una Mesa</h2>
+                <form id="reservation-form" class="form-container glass-container">
+                    <div class="form-group">
+                        <label for="name">Nombre a Reservar</label>
+                        <input type="text" id="name" name="name" placeholder="Ej. Juan Pérez" required>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="date">Fecha</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="col">
+                            <label for="time">Hora</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                         <div class="col">
+                            <label for="guests">Personas</label>
+                            <input type="number" id="guests" name="guests" min="1" max="15" value="2" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="cta-button full-width">Confirmar Reserva VIP</button>
+                </form>
+            </section>
+
+            <!-- PANEL ADMIN -->
+            <section id="admin" class="page">
+                <h2>Dashboard de Administración</h2>
+                
+                <div class="admin-grid">
+                    <div class="admin-form glass-container">
+                        <h3><i class="fa-solid fa-plus-circle"></i> Nuevo Plato</h3>
+                        <form id="new-product-form">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="np-name" required>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <label>Precio (Bs)</label>
+                                    <input type="number" step="0.5" id="np-price" required>
+                                </div>
+                                <div class="col">
+                                    <label>Categoría</label>
+                                    <select id="np-category" class="custom-select" required>
+                                        <option value="hamburguesas">Hamburguesas</option>
+                                        <option value="lomitos">Lomitos</option>
+                                        <option value="pollos">Pollos</option>
+                                        <option value="sodas">Sodas</option>
+                                        <option value="refrescos">Refrescos</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label>Stock</label>
+                                    <input type="number" id="np-stock" value="10" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>URL de Imagen (Opcional)</label>
+                                <input type="text" id="np-image" placeholder="https://ejemplo.com/foto.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea id="np-desc" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="cta-button" style="padding: 0.5rem 1rem;">Registrar Producto</button>
+                        </form>
+                    </div>
+
+                    <div class="admin-table-container glass-container">
+                        <h3><i class="fa-solid fa-boxes-stacked"></i> Control de Inventario</h3>
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Plato</th>
+                                    <th>Sección</th>
+                                    <th>Precio(Bs)</th>
+                                    <th>Stock</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="admin-login-modal" class="modal-backdrop">
+        <div class="modal-content glass-container login-box">
+            <button class="modal-close" id="close-login-btn">&times;</button>
+            <div class="admin-icon-brand"><i class="fa-solid fa-user-shield"></i></div>
+            <h3>Acceso Restringido</h3>
+            <p>Solo para administración de Liliana & Gladis</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="admin-user" placeholder="Usuario" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="admin-pass" placeholder="Contraseña" required>
+                    </div>
+                </div>
+                <p id="login-error" class="login-error-message hidden">Credenciales Incorrectas</p>
+                <button type="submit" class="cta-button full-width">Verificar Acceso</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div id="success-modal" class="modal-backdrop">
+        <div class="modal-content glass-container text-center">
+            <button id="close-success-modal-btn" class="modal-close">&times;</button>
+            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <h3 id="success-modal-title">¡Éxito!</h3>
+            <p id="success-modal-message">Tu operación se completó.</p>
+            <button id="generate-pdf-btn" class="cta-button">Imprimir Recibo PDF</button>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Variables to pass to JS -->
+    <script>
+        const API_URL = "http://127.0.0.1:5000"; 
+    </script>
+    <script src="js/scripts.js"></script>
+</body>
+</html>
