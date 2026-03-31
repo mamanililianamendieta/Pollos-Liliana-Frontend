@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initApp() {
         checkAuth();
         setupNavigation();
+        setupMobileMenu();
         setupMenuEvents();
         setupCartEvents();
         setupForms();
@@ -23,6 +24,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showLoader() { loader.style.display = 'flex'; }
     function hideLoader() { loader.style.display = 'none'; }
+
+    // --- MOBILE MENU ---
+    function setupMobileMenu() {
+        const hamburger = document.getElementById('hamburger-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+        const overlay   = document.getElementById('mobile-nav-overlay');
+        const closeBtn  = document.getElementById('mobile-nav-close');
+
+        function openMenu()  { mobileNav.classList.add('open'); overlay.classList.add('visible'); hamburger.classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeMenu() { mobileNav.classList.remove('open'); overlay.classList.remove('visible'); hamburger.classList.remove('open'); document.body.style.overflow = ''; }
+
+        hamburger?.addEventListener('click', openMenu);
+        closeBtn?.addEventListener('click', closeMenu);
+        overlay?.addEventListener('click', closeMenu);
+
+        // Mobile nav links → navigate + close menu
+        document.querySelectorAll('.mobile-nav-link[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = link.dataset.page;
+                if (pageId === 'admin' && !sessionStorage.getItem('adminToken')) return;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(l => l.classList.remove('active'));
+                const page = document.getElementById(pageId);
+                if (page) {
+                    page.classList.add('active');
+                    link.classList.add('active');
+                    // Sync desktop nav active state
+                    document.querySelector(`.nav-link[data-page="${pageId}"]`)?.classList.add('active');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    if (pageId === 'pedido') renderCartPage();
+                    if (pageId === 'admin') renderAdminTable();
+                }
+                closeMenu();
+            });
+        });
+
+        // Mobile admin login
+        document.getElementById('mobile-open-admin-login')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMenu();
+            document.getElementById('admin-login-modal').classList.add('show');
+        });
+
+        // Mobile logout
+        document.getElementById('mobile-logout-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.removeItem('adminToken');
+            checkAuth();
+            document.querySelector('[data-page="inicio"]').click();
+            showNotification('Sesión cerrada');
+            closeMenu();
+        });
+    }
 
     function checkAuth() {
         const token = sessionStorage.getItem('adminToken');
@@ -109,8 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CART LOGIC ---
     function updateCartCounter() {
-        const counter = document.getElementById('cart-counter');
-        counter.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cart-counter').textContent = total;
+        const mc = document.getElementById('mobile-cart-counter');
+        if (mc) mc.textContent = total;
     }
 
     function addToCart(id) {
