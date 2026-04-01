@@ -137,11 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadProducts() {
         showLoader();
         try {
-            const res = await fetch(`${API_URL}/api/products`);
+            // Añadir timestamp para evitar caché agresiva en navegadores y proxies
+            const res = await fetch(`${API_URL}/api/products?t=${new Date().getTime()}`, {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' }
+            });
             if (res.ok) {
                 menuItems = await res.json();
                 renderMenu();
-                renderReservationItems(); // Fill the selection grid in the reservation form
+                renderReservationItems(); 
                 if(sessionStorage.getItem('adminToken')) renderAdminTable();
             } else {
                 showNotification('Error cargando el menú', 'error');
@@ -611,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.setTextColor(255, 255, 255);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                doc.text('POLLOS LILIANA & GLADIS', 40, 25, null, null, 'center');
+                doc.text('Pollos - Liliana', 40, 25, null, null, 'center');
 
                 // Título
                 doc.setTextColor(0,0,0);
@@ -658,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.text('¡Gracias! Le esperamos con gusto.', 40, nextY + 28, null, null, 'center');
                 doc.text('Cuatro Cañadas | +591 63585285', 40, nextY + 33, null, null, 'center');
 
-                doc.save('Reserva_Confirmacion_L&G.pdf');
+                doc.save('Reserva_Pollos_Liliana.pdf');
                 btn.textContent = '📄 Descargar Confirmación';
                 btn.disabled = false;
                 return;
@@ -698,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(9);
-            doc.text("POLLOS LILIANA & GLADIS", 40, 25, null, null, "center");
+            doc.text("Pollos - Liliana", 40, 25, null, null, "center");
             
             // -- SUBTÍTULO --
             doc.setTextColor(0, 0, 0);
@@ -747,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.text("¡Gracias por su preferencia!", 40, finalY + 42, null, null, "center");
             doc.text("Cuatro Cañadas | WhatsApp: +591 63585285", 40, finalY + 47, null, null, "center");
             
-            doc.save("Ticket_L&G.pdf");
+            doc.save("Ticket_Pollos_Liliana.pdf");
             
             btn.textContent = "Imprimir Recibo PDF";
             btn.disabled = false;
@@ -759,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!lastOrder || lastOrder.length === 0) return;
             
             // WhatsApp de PEDIDO
-            let message = "🍗 *NUEVO PEDIDO - POLLOS LILIANA & GLADIS* 🍗\n\n";
+            let message = "🍗 *NUEVO PEDIDO - Pollos - Liliana* 🍗\n\n";
             message += "Hola, acabo de realizar este pedido en la web:\n";
             lastOrder.forEach(item => {
                 message += `👉 ${item.quantity}x ${item.name} (- Bs ${(item.price * item.quantity).toFixed(2)})\n`;
@@ -769,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Si es reserva, cambiar mensaje
             if (lastModalContext === 'reservation') {
-                message  = `🗓️ *NUEVA RESERVA - POLLOS LILIANA & GLADIS* 🗓️\n\n`;
+                message  = `🗓️ *NUEVA RESERVA - Pollos - Liliana* 🗓️\n\n`;
                 message += `Hola, me gustaría confirmar mi reserva:\n`;
                 message += `👤 Nombre: *${lastReservation.name}*\n`;
                 message += `📅 Fecha: *${lastReservation.date}*\n`;
