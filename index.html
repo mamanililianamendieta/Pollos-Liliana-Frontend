@@ -11,7 +11,7 @@
     <!-- Open Graph / Facebook (Prioridad para WhatsApp) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://pollos-liliana-frontend.onrender.com/">
-    <meta property="og:title" content="Pollos - Liliana & Gladis | El Mejor Sabor de Cuatro Cañadas">
+    <meta property="og:title" content="Pollos - Liliana | El Mejor Sabor de Cuatro Cañadas">
     <meta property="og:description" content="¡El mejor sabor de Cuatro Cañadas! Hamburguesas, Lomitos y el Pollo más crocante.">
     <meta property="og:image" content="https://pollos-liliana-frontend.onrender.com/images/banner-pollos-liliana.png">
     <meta property="og:image:secure_url" content="https://pollos-liliana-frontend.onrender.com/images/banner-pollos-liliana.png">
@@ -28,7 +28,6 @@
     <meta name="twitter:image" content="https://pollos-liliana-frontend.onrender.com/images/banner-pollos-liliana.png">
     
     <!-- PWA & Mobile Optimization -->
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b0000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -40,6 +39,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Usar un solo manifest centralizado en la raíz -->
+
+
+
+<!-- Link para instalar a pantalla -->
+<link rel="manifest" href="/instalar/manifest.json">
 </head>
 <body>
 
@@ -366,5 +370,8 @@
         const API_URL = "https://pollos-liliana-backend.onrender.com"; 
     </script>
     <script src="js/scripts.js"></script>
+
+<!-- script para instalar a pantalla -->
+<script src="/instalar/pwa.js"></script>
 </body>
 </html>
