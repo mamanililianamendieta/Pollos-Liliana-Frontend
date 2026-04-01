@@ -1,6 +1,7 @@
 {
   "name": "Pollos Liliana",
   "short_name": "Pollos Liliana",
+  "id": "/",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",

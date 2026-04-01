@@ -1,10 +1,10 @@
-const CACHE_NAME = 'app-cache-v3';
+const CACHE_NAME = 'app-cache-v4'; // Versión actualizada para forzar refresco
 const urlsToCache = [
   '/',
   '/index.html',
   '/css/styles.css',
   '/js/scripts.js',
-  '/instalar/pwa.js',
+  '/pwa.js',
   '/instalar/icon-192.png',
   '/instalar/icon-512.png'
 ];
@@ -13,10 +13,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[SW] Cache abierto en raíz');
+        console.log('[SW] Cache abierto en raíz (V4)');
         return cache.addAll(urlsToCache.map(url => new Request(url, {cache: 'reload'})));
       })
-      .catch(err => console.error('[SW] Error al cachear en raíz:', err))
+      .then(() => self.skipWaiting()) // Activar de inmediato
   );
 });
 
@@ -38,6 +38,6 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // Tomar control de inmediato
   );
 });
