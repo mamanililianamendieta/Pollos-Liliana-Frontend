@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Pollos Liliana & Gladis</title>
+    <title>Pollos - Liliana | Sabor Premium</title>
     
     <!-- PWA & Mobile Optimization -->
-    <link rel="manifest" href="instalacion/manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b0000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="manifest" href="instalacion/manifest.json">
+    <!-- Usar un solo manifest centralizado en la raíz -->
 </head>
 <body>
 
@@ -26,7 +26,7 @@
         <!-- HEADER GLASSMORPHISM -->
         <header class="main-header">
             <div class="logo-container">
-                <h2>🍗 L&G</h2>
+                <h2>🍗 Pollos - Liliana</h2>
             </div>
             <nav class="main-nav" id="main-nav">
                 <a href="#" class="nav-link active" data-page="inicio">Inicio</a>
@@ -51,7 +51,7 @@
         <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
         <nav class="mobile-nav" id="mobile-nav">
             <button class="mobile-nav-close" id="mobile-nav-close"><i class="fa-solid fa-xmark"></i></button>
-            <div class="mobile-nav-logo">🍗 Pollos L&G</div>
+            <div class="mobile-nav-logo">🍗 Pollos - Liliana</div>
             <a href="#" class="mobile-nav-link" data-page="inicio"><i class="fa-solid fa-house"></i> Inicio</a>
             <a href="#" class="mobile-nav-link" data-page="menu"><i class="fa-solid fa-utensils"></i> Menú</a>
             <a href="#" class="mobile-nav-link" data-page="pedido"><i class="fa-solid fa-cart-shopping"></i> Carrito <span id="mobile-cart-counter" class="mobile-counter">0</span></a>
@@ -76,20 +76,27 @@
                 </div>
                 
                 <div id="chefs" class="page-section">
-                    <h2>Nuestras Maestras del Sabor</h2>
+                    <h2>Equipo de Expertos</h2>
                     <div class="card-container">
                         <div class="card premium-card">
                             <img src="images/liliana.png" alt="Liliana" class="card-img">
                             <div class="card-body">
-                                <h3 class="card-title">Liliana Mamani Mendieta</h3>
-                                <p class="card-text">Especialista en la preparación de hamburguesas y lomitos con un sazón inigualable que deleita a toda la comunidad.</p>
+                                <h3 class="card-title">Liliana Mendieta</h3>
+                                <p class="card-text">Maestra Especialista en hamburguesas y lomitos con un sazón inigualable que deleita a toda la comunidad.</p>
+                            </div>
+                        </div>
+                        <div class="card premium-card">
+                            <img src="images/ramon.png" alt="Ramon" class="card-img">
+                            <div class="card-body">
+                                <h3 class="card-title">Ramon Menezes</h3>
+                                <p class="card-text">Experto internacional en la preparación de refrescos frutales y bebidas tradicionales con el toque L&G.</p>
                             </div>
                         </div>
                         <div class="card premium-card">
                             <img src="images/gladis.png" alt="Gladis" class="card-img">
                             <div class="card-body">
-                                <h3 class="card-title">Gladis Mamani Mendieta</h3>
-                                <p class="card-text">La experta en el pollo crujiente y frituras doradas. Asegurando que cada bocado mantenga la calidad que nos caracteriza.</p>
+                                <h3 class="card-title">Gladis Mendieta</h3>
+                                <p class="card-text">Experta en pollo crujiente y frituras doradas, asegurando la calidad crocante que nos caracteriza.</p>
                             </div>
                         </div>
                     </div>
@@ -104,7 +111,7 @@
 
                 <footer class="pie-de-pagina">
                     <div class="footer-content">
-                        <h3>Pollos Liliana & Gladis</h3>
+                        <h3>Pollos - Liliana</h3>
                         <p>📍 Cuatro Cañadas, Santa Cruz</p>
                         <p>Teléfono: +591 63585285</p>
                         <div class="social-icons">

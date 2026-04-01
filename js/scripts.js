@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastTotal = 0;
     let lastModalContext = 'order'; // 'order' | 'reservation'
     let lastReservation = {};
-    let reservationCart = []; // Current selection in the reservation form
+    let reservationCart = []; 
+    let deferredPrompt; // PWA Install prompt event
     
     // Selectors
     const appContainer = document.getElementById('app-container');
@@ -24,7 +25,42 @@ document.addEventListener('DOMContentLoaded', () => {
         setupMenuEvents();
         setupCartEvents();
         setupForms();
+        registerServiceWorker(); // Activate PWA
         loadProducts();
+    }
+
+    function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[SW] PWA Registered', reg.scope))
+                    .catch(err => console.error('[SW] Registration failed', err));
+            });
+        }
+    }
+
+    // --- PWA INSTALL LOGIC ---
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent default browser prompt
+        e.preventDefault();
+        // Save event
+        deferredPrompt = e;
+        // Show install button in UI
+        const installBtns = document.querySelectorAll('.install-app-btn');
+        installBtns.forEach(btn => btn.classList.remove('hidden'));
+    });
+
+    function handleInstall() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+            if (choice.outcome === 'accepted') {
+                console.log('[PWA] User accepted install');
+            }
+            deferredPrompt = null;
+            const installBtns = document.querySelectorAll('.install-app-btn');
+            installBtns.forEach(btn => btn.classList.add('hidden'));
+        });
     }
 
     function showLoader() { loader.style.display = 'flex'; }
@@ -127,8 +163,15 @@ document.addEventListener('DOMContentLoaded', () => {
         menuGrid.innerHTML = '';
         
         let filtered = menuItems;
-        if (category !== 'all') filtered = filtered.filter(i => i.category === category);
-        if (searchTerm) filtered = filtered.filter(i => i.name.toLowerCase().includes(searchTerm));
+        if (category !== 'all') {
+            filtered = filtered.filter(i => {
+                const itemCat = (i.category || '').toLowerCase().trim();
+                return itemCat === category.toLowerCase();
+            });
+        }
+        if (searchTerm) {
+            filtered = filtered.filter(i => i.name.toLowerCase().includes(searchTerm));
+        }
 
         if (filtered.length === 0) {
             menuGrid.innerHTML = '<p style="text-align:center; width: 100%; color:#888;">No se encontraron productos.</p>';
@@ -478,6 +521,14 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification('Sesión cerrada');
         });
 
+        // PWA Install buttons
+        document.querySelectorAll('.install-app-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleInstall();
+            });
+        });
+
         // Add new product
         document.getElementById('new-product-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -744,16 +795,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ADMIN DASHBOARD ---
     function renderAdminTable() {
         const tbody = document.getElementById('inventory-tbody');
+        if (!tbody) return;
         tbody.innerHTML = '';
         menuItems.forEach(item => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>#${item.id}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.category}</td>
-                <td><input type="number" id="edit-price-${item.id}" value="${item.price}" step="0.5" class="edit-input"></td>
-                <td><input type="number" id="edit-stock-${item.id}" value="${item.stock}" class="edit-input"></td>
-                <td><button class="save-btn" onclick="document.dispatchEvent(new CustomEvent('updateProduct', {detail:${item.id}}))"><i class="fa-solid fa-floppy-disk"></i> Guardar</button></td>
+                <td data-label="ID">#${item.id}</td>
+                <td data-label="Plato"><strong>${item.name}</strong></td>
+                <td data-label="Sección">${item.category}</td>
+                <td data-label="Precio(Bs)"><input type="number" id="edit-price-${item.id}" value="${item.price}" step="0.5" class="edit-input"></td>
+                <td data-label="Stock"><input type="number" id="edit-stock-${item.id}" value="${item.stock}" class="edit-input"></td>
+                <td data-label="Acción"><button class="save-btn" onclick="document.dispatchEvent(new CustomEvent('updateProduct', {detail:${item.id}}))"><i class="fa-solid fa-floppy-disk"></i></button></td>
             `;
             tbody.appendChild(tr);
         });
