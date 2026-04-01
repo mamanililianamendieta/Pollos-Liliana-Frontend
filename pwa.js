@@ -4,7 +4,7 @@ installButton.id = 'pwa-install-button';
 installButton.textContent = 'Instalar App';
 Object.assign(installButton.style, {
   position: 'fixed',
-  top: '75px', // <--- ¡PARA EL BOTON DE INSTALAR ESTE ARRIBA
+  top: '70px', // <--- ¡PARA EL BOTON DE INSTALAR ESTE ARRIBA
   right: '30px',
   padding: '10px 20px',
   backgroundColor: '#3367D6',
