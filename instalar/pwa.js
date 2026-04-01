@@ -73,7 +73,7 @@ installButton.addEventListener('click', async () => {
 // Registro del Service Worker (sin cambios)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/instalar/sw.js')
+    navigator.serviceWorker.register('/sw.js')
       .then(registration => {
         console.log('[PWA] Service Worker registrado con éxito:', registration.scope);
       })
