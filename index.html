@@ -133,11 +133,6 @@
                     </div>
                     <select id="category-filter" class="custom-select">
                         <option value="all">Todo Nuestro Sabor</option>
-                        <option value="hamburguesas">Hamburguesas🍔</option>
-                        <option value="lomitos">Lomitos🥩</option>
-                        <option value="pollos">Pollos🍗</option>
-                        <option value="sodas">Sodas🥤</option>
-                        <option value="refrescos">Refrescos🍹</option>
                     </select>
                 </div>
                 <div id="loader" class="loader" style="display:none;"><div class="spinner"></div></div>
@@ -181,6 +176,12 @@
                     </div>
                     <h3 style="color:var(--primary); margin-top:1.5rem;"><i class="fa-solid fa-utensils"></i> Platos a Consumir (opcional)</h3>
                     <p style="color:#777; font-size:0.9rem; margin-top:-0.5rem; margin-bottom:1rem;">Selecciona los platos que planeas pedir al llegar. <strong>No descuenta stock.</strong></p>
+                    <div class="row" style="margin-bottom:1rem; gap:1rem;">
+                        <input type="text" id="res-search-input" placeholder="Buscar plato..." style="flex:1; padding:0.6rem; border-radius:30px; border:1px solid #ddd;">
+                        <select id="reservation-category-filter" class="custom-select" style="flex:1;">
+                            <option value="all">Todas las categorías</option>
+                        </select>
+                    </div>
                     <div id="reservation-items-grid" class="reservation-items-grid">
                         <p style="color:#aaa;">Cargando menú...</p>
                     </div>
@@ -213,13 +214,7 @@
                                 <div class="col">
                                     <label>Categoría</label>
                                     <input list="category-list" id="np-category" class="custom-select" placeholder="Escriba o elija..." required>
-                                    <datalist id="category-list">
-                                        <option value="hamburguesas">
-                                        <option value="lomitos">
-                                        <option value="pollos">
-                                        <option value="sodas">
-                                        <option value="refrescos">
-                                    </datalist>
+                                    <datalist id="category-list"></datalist>
                                 </div>
                                 <div class="col">
                                     <label>Stock</label>

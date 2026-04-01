@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (res.ok) {
                 menuItems = await res.json();
+                renderCategoryFilters(); // NUEVO: Poblado dinámico
                 renderMenu();
                 renderReservationItems(); 
                 if(sessionStorage.getItem('adminToken')) renderAdminTable();
@@ -219,9 +220,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderReservationItems() {
         const grid = document.getElementById('reservation-items-grid');
         if (!grid) return;
+        
+        const searchTerm = (document.getElementById('res-search-input')?.value || '').toLowerCase();
+        const category = document.getElementById('reservation-category-filter')?.value || 'all';
+        
         grid.innerHTML = '';
         
-        menuItems.forEach(item => {
+        let filtered = menuItems;
+        if (category !== 'all') {
+            filtered = filtered.filter(i => (i.category || '').toLowerCase().trim() === category.toLowerCase());
+        }
+        if (searchTerm) {
+            filtered = filtered.filter(i => i.name.toLowerCase().includes(searchTerm));
+        }
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; width: 100%; color:#888; padding: 1rem;">No se encontraron artículos.</p>';
+            return;
+        }
+
+        filtered.forEach(item => {
             const isSelected = reservationCart.find(i => i.id === item.id);
             const card = document.createElement('div');
             card.className = `res-item-card ${isSelected ? 'selected' : ''}`;
@@ -438,6 +456,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             hideLoader();
         });
+
+        // Filtros de Reservación
+        document.getElementById('res-search-input')?.addEventListener('input', renderReservationItems);
+        document.getElementById('reservation-category-filter')?.addEventListener('change', renderReservationItems);
     }
 
     function setupNavigation() {
@@ -835,6 +857,59 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         hideLoader();
     });
+
+    function renderCategoryFilters() {
+        const filters = document.querySelectorAll('#category-filter, #reservation-category-filter');
+        const adminDatalist = document.getElementById('category-list');
+        
+        // Extraer categorías únicas
+        const categories = [...new Set(menuItems.map(item => item.category.toLowerCase().trim()))];
+        
+        // Mapeo de iconos para un look "Pro"
+        const iconMap = {
+            'hamburguesas': '🍔',
+            'lomitos': '🥩',
+            'pollos': '🍗',
+            'sodas': '🥤',
+            'refrescos': '🍹',
+            'sopas': '🥣',
+            'sopa': '🥣',
+            'entradas': '🥗',
+            'postres': '🍰',
+            'papas': '🍟',
+            'almuerzo': '🍽️',
+            'especiales': '✨'
+        };
+
+        filters.forEach(select => {
+            if (!select) return;
+            const currentValue = select.value;
+            select.innerHTML = '<option value="all">Todo Nuestro Sabor</option>';
+            
+            categories.forEach(cat => {
+                const icon = iconMap[cat] || '🍽️';
+                const capitalized = cat.charAt(0).toUpperCase() + cat.slice(1);
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = `${capitalized} ${icon}`;
+                select.appendChild(option);
+            });
+            
+            if (Array.from(select.options).some(opt => opt.value === currentValue)) {
+                select.value = currentValue;
+            }
+        });
+
+        // Actualizar datalist del admin para sugerencias
+        if (adminDatalist) {
+            adminDatalist.innerHTML = '';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.charAt(0).toUpperCase() + cat.slice(1);
+                adminDatalist.appendChild(option);
+            });
+        }
+    }
 
     // Utilities
     function showNotification(msg, type='success') {

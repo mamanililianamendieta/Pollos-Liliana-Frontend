@@ -1,11 +1,13 @@
 {
-  "name": "Pollos Liliana & Gladis",
-  "short_name": "L&G Pollos",
+  "name": "Pollos - Liliana",
+  "short_name": "Pollos Liliana",
+  "description": "El Mejor Sabor de Cuatro Cañadas. Hamburguesas, Lomitos y Pollos Crujientes.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#8b0000",
-  "description": "El Mejor Sabor de Cuatro Cañadas. ¡Te esperamos en Pollos Liliana & Gladis!",
+  "scope": "/",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "instalacion/assets/icon-192.png",
