@@ -2,6 +2,8 @@ const CACHE_NAME = 'app-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/css/styles.css',
+  '/js/scripts.js',
   '/instalar/pwa.js',
   '/instalar/icon-192.png',
   '/instalar/icon-512.png'
@@ -11,10 +13,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[SW] Cache abierto');
+        console.log('[SW] Cache abierto en raíz');
         return cache.addAll(urlsToCache.map(url => new Request(url, {cache: 'reload'})));
       })
-      .catch(err => console.error('[SW] Error al cachear:', err))
+      .catch(err => console.error('[SW] Error al cachear en raíz:', err))
   );
 });
 
