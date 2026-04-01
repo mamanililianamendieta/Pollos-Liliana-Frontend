@@ -1,12 +1,12 @@
 :root {
     --primary: #8b0000; 
-    --primary-gradient: linear-gradient(135deg, #8b0000, #5d0000);
+    --primary-gradient: linear-gradient(180deg, #8b0000, #7a0000);
     --accent: #ffcc00;
     --accent-hover: #ffaa00;
-    --bg-color: #d84315; /* Color del texto en movimiento (Naranja/Rojo Vivo) */
+    --bg-color: #1a0f0f; /* Color profesional "bajito" (Vino muy oscuro) */
     --glass-bg: rgba(255, 255, 255, 0.95);
     --glass-border: rgba(255, 255, 255, 0.8);
-    --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
     --text-dark: #1a1a1a;
     --text-light: #ffffff;
     --accent-glow: rgba(255, 204, 0, 0.7);
@@ -249,13 +249,12 @@ body, .app-container, .main-content {
 .map-container iframe { border-radius: 15px; }
 
 .pie-de-pagina { 
+    background: var(--primary-gradient); 
+    padding: 1.5rem 1rem; 
     text-align: center; 
-    padding: 2rem 1rem; 
-    margin-top: 3rem; 
-    background: #111; /* Color extra elegante para footer compacto */
-    color: var(--text-light); 
-    border-radius: 0; 
-    position: relative; 
+    color: white;
+    border: none; 
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
 }
 .footer-content {
     max-width: 600px;
