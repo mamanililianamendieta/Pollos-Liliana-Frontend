@@ -3,7 +3,7 @@
     --primary-gradient: linear-gradient(180deg, #8b0000, #7a0000);
     --accent: #ffcc00;
     --accent-hover: #ffaa00;
-    --bg-color: #1a0f0f; /* Color profesional "bajito" (Vino muy oscuro) */
+    --bg-color: #fff5f5; /* Color rojo suave/pastel profesional (bajito, no oscuro) */
     --glass-bg: rgba(255, 255, 255, 0.95);
     --glass-border: rgba(255, 255, 255, 0.8);
     --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
