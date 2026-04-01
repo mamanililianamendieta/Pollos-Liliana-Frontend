@@ -782,19 +782,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // WhatsApp Checkout
         document.getElementById('whatsapp-btn')?.addEventListener('click', () => {
-            if(!lastOrder || lastOrder.length === 0) return;
+            let message = "";
             
-            // WhatsApp de PEDIDO
-            let message = "🍗 *NUEVO PEDIDO - Pollos - Liliana* 🍗\n\n";
-            message += "Hola, acabo de realizar este pedido en la web:\n";
-            lastOrder.forEach(item => {
-                message += `👉 ${item.quantity}x ${item.name} (- Bs ${(item.price * item.quantity).toFixed(2)})\n`;
-            });
-            message += `\n💵 *TOTAL COMPRA: Bs ${lastTotal.toFixed(2)}*\n\n`;
-            message += "¡Muchas gracias! Ya descargué mi recibo también.";
-
-            // Si es reserva, cambiar mensaje
             if (lastModalContext === 'reservation') {
+                // WhatsApp de RESERVA
+                if (!lastReservation || !lastReservation.name) return;
+                
                 message  = `🗓️ *NUEVA RESERVA - Pollos - Liliana* 🗓️\n\n`;
                 message += `Hola, me gustaría confirmar mi reserva:\n`;
                 message += `👤 Nombre: *${lastReservation.name}*\n`;
@@ -809,12 +802,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (lastReservation.notes) message += `\n📝 Notas: ${lastReservation.notes}\n`;
                 message += `\n¡Los esperamos! 🍗`;
+            } else {
+                // WhatsApp de PEDIDO
+                if (!lastOrder || lastOrder.length === 0) return;
+                
+                message  = "🍗 *NUEVO PEDIDO - Pollos - Liliana* 🍗\n\n";
+                message += "Hola, acabo de realizar este pedido en la web:\n";
+                lastOrder.forEach(item => {
+                    message += `👉 ${item.quantity}x ${item.name} (- Bs ${(item.price * item.quantity).toFixed(2)})\n`;
+                });
+                message += `\n💵 *TOTAL COMPRA: Bs ${lastTotal.toFixed(2)}*\n\n`;
+                message += "¡Muchas gracias! Ya descargué mi recibo también.";
             }
 
             const encodedMessage = encodeURIComponent(message);
             const phoneNumber = "59163585285";
             window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
-            // El modal NO se cierra automáticamente
         });
     }
 
