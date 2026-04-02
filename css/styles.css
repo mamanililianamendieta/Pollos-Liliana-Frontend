@@ -134,8 +134,8 @@ body, .app-container, .main-content {
 }
 
 /* MARQUEE */
-.title-bar { background: #ffecb3; padding: 0.8rem; margin: 0; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.marquee-container span { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 1.1rem; font-weight: 700; color: #d84315; }
+.title-bar { background: #ffecb3; padding: 1rem; margin: 0; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.marquee-container span { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 1.3rem; font-weight: 800; color: #d84315; }
 @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
 /* PAGES */
@@ -402,8 +402,10 @@ body, .app-container, .main-content {
     .logo-container h2 { font-size: 1.4rem; text-align: center; white-space: nowrap; }
     .main-nav { display: none; }           /* Oculta nav de escritorio */
     .hamburger-btn { display: flex; position: absolute; right: 1rem; }      /* Muestra botón ☰ a la derecha */
-    .title-bar { margin-top: 65px; }
-    /* FIX: padding-top igual a la altura del header fijo (65px) + espacio extra */
+    /* FIX: margin-top removido del title-bar; main-content ya tiene padding-top: 65px */
+    .title-bar { margin-top: 0; padding: 1rem; }
+    .marquee-container span { font-size: 1.3rem; font-weight: 800; }
+    /* FIX: padding-top igual a la altura del header fijo (65px) */
     .main-content { padding: 65px 1rem 1.5rem; }
     .hero { padding: 4rem 1.5rem; border-radius: 15px; }
     .hero h2 { font-size: 2rem; letter-spacing: 1px; }
@@ -432,8 +434,10 @@ body, .app-container, .main-content {
     .main-header { padding: 0 0.8rem; height: 60px; width: 100%; }
     .logo-container h2 { font-size: 1.1rem; }
     .nav-link { padding: 0.2rem 0.4rem; }
-    .title-bar { margin-top: 60px; font-size: 0.85rem; padding: 0.5rem; width: 100%; }
-    .marquee-container span { font-size: 0.85rem; }
+    /* FIX: margin-top:0 porque main-content ya tiene padding-top:60px — evita espacio blanco doble */
+    .title-bar { margin-top: 0 !important; padding: 1rem 0.8rem; width: 100%; }
+    /* Marquee más grande para llenar la barra visualmente */
+    .marquee-container span { font-size: 1.2rem; font-weight: 800; }
 
     .app-container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
     /* FIX CRÍTICO: padding-top = altura del header (60px) para que los títulos sean visibles */
