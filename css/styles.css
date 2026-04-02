@@ -62,7 +62,7 @@ body, .app-container, .main-content {
     display: flex; align-items: center; gap: 0.5rem;
 }
 .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.2); color: var(--accent); }
-#cart-counter { background: var(--accent); color: var(--text-dark); border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; }
+
 .admin-nav { background: #e53935; color: white; border: 1px solid #ff5252; box-shadow: 0 0 10px rgba(229, 57, 53, 0.5); }
 .admin-nav:hover { background: #ff5252; color: white; }
 
@@ -168,6 +168,7 @@ body, .app-container, .main-content {
 .cta-button:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; box-shadow: none; }
 .full-width { width: 100%; }
 
+#cart-counter { background: var(--accent); color: var(--text-dark); border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; }
 /* CARDS */
 .page-section h2, .page h2 { font-size: 2.8rem; font-weight: 900; text-align: center; color: var(--primary); margin-bottom: 2rem; }
 .card-container { 
@@ -216,11 +217,12 @@ body, .app-container, .main-content {
 .menu-controls { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 3rem; padding: 1.5rem !important; flex-wrap: wrap;}
 .search-box { position: relative; width: 100%; max-width: 400px; }
 .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
-#search-input { width: 100%; padding: 0.9rem 1rem 0.9rem 2.5rem; border: 1px solid #ddd; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; transition: border 0.3s; }
+
 #search-input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(211, 47, 47, 0.2); }
 .custom-select { padding: 0.9rem 1.5rem; border: 1px solid #ddd; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; background: white; cursor: pointer; min-width: 200px; }
 
 /* CART & FORMS */
+
 #cart-container, #reservation-form { max-width: 800px; margin: 0 auto; }
 .cart-item { display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; background: rgba(255,255,255,0.8); border-radius: 15px; border: 1px solid #eee; transition: all 0.3s; }
 .cart-item:hover { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
@@ -234,8 +236,6 @@ body, .app-container, .main-content {
 .quantity-input { width: 40px; text-align: center; border: none; background: transparent; font-weight: bold; font-family: 'Poppins'; font-size: 1.1rem; }
 .remove-item-btn { background: #ffebee; color: var(--primary); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; margin-left: auto; transition: 0.2s; }
 .remove-item-btn:hover { background: var(--primary); color: white; }
-#cart-total-section { text-align: right; margin-top: 2rem; font-size: 1.8rem; font-weight: 900; color: var(--primary); padding-top: 1rem; border-top: 2px dashed #ddd; }
-#cart-total-section p { margin-bottom: 1rem; }
 
 .form-group { margin-bottom: 1.5rem; text-align: left; }
 .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555; }
@@ -308,6 +308,7 @@ body, .app-container, .main-content {
 /* NOTIFICATIONS & LOADER */
 .notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #333; color: white; padding: 1rem 2.5rem; border-radius: 50px; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 3000; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .notification.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
 .success-icon { font-size: 4rem; color: #4caf50; margin-bottom: 1rem; }
 
 .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 4000; display: flex; justify-content: center; align-items: center; }
@@ -390,7 +391,8 @@ body, .app-container, .main-content {
     .admin-grid { grid-template-columns: 1fr; }
     .hero h2 { font-size: 2.5rem; }
     .card-container { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
-    .main-content { padding: 2rem; }
+    /* FIX: Asegurar que el contenido no quede debajo del header fijo */
+    .main-content { padding: 95px 2rem 2rem; }
 }
 
 /* TABLET */
@@ -401,10 +403,13 @@ body, .app-container, .main-content {
     .main-nav { display: none; }           /* Oculta nav de escritorio */
     .hamburger-btn { display: flex; position: absolute; right: 1rem; }      /* Muestra botón ☰ a la derecha */
     .title-bar { margin-top: 65px; }
-    .main-content { padding: 1.5rem 1rem; }
+    /* FIX: padding-top igual a la altura del header fijo (65px) + espacio extra */
+    .main-content { padding: 65px 1rem 1.5rem; }
     .hero { padding: 4rem 1.5rem; border-radius: 15px; }
     .hero h2 { font-size: 2rem; letter-spacing: 1px; }
     .hero p { font-size: 1.1rem; }
+    /* FIX: Título de página visible con margen superior adecuado */
+    .page > h2:first-child { margin-top: 1.5rem; padding-top: 0.5rem; }
     .page h2 { font-size: 2rem; }
     .card-container { grid-template-columns: 1fr; gap: 1.2rem; } /* Forzado a FILAS (una por una) */
     .card-img { height: 220px; }
@@ -429,25 +434,33 @@ body, .app-container, .main-content {
     .nav-link { padding: 0.2rem 0.4rem; }
     .title-bar { margin-top: 60px; font-size: 0.85rem; padding: 0.5rem; width: 100%; }
     .marquee-container span { font-size: 0.85rem; }
-    
+
     .app-container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
-    .main-content { padding: 0.5rem 0 !important; width: 100% !important; overflow-x: hidden; }
+    /* FIX CRÍTICO: padding-top = altura del header (60px) para que los títulos sean visibles */
+    .main-content { padding: 60px 0 0.5rem !important; width: 100% !important; overflow-x: hidden; }
     .glass-container { padding: 1.2rem 0.8rem !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; width: 100% !important; margin: 0 !important; box-shadow: none; }
-    
+
     .hero { padding: 3rem 1rem; border-radius: 0; margin-bottom: 1.5rem; width: 100%; background-position: center; height: 300px; display: flex; flex-direction: column; justify-content: center; }
     .hero h2 { font-size: 1.6rem; margin-bottom: 0.8rem; }
     .hero p { font-size: 0.95rem; margin-bottom: 1.5rem; }
     .cta-button { padding: 0.8rem 1.8rem; font-size: 1rem; }
-    
+
+    /* FIX: Títulos de páginas visibles con margen superior en mobile */
+    .page > h2:first-child { 
+        margin-top: 1.2rem !important; 
+        padding-top: 0.5rem;
+        font-size: 1.8rem; 
+        margin-bottom: 1.2rem;
+    }
     .page h2 { font-size: 1.8rem; margin-bottom: 1.2rem; margin-top: 1.5rem; }
     .card-container { grid-template-columns: 1fr; gap: 1.8rem; padding: 0 1.2rem; }
     .card-img { aspect-ratio: 16 / 9; height: auto; padding: 0; }
     .card-title { font-size: 1.5rem; }
-    
+
     .cart-item { flex-wrap: wrap; padding: 1rem; gap: 1rem; border-radius: 12px; }
     .cart-item-img { width: 70px; height: 70px; }
     #cart-total-section { font-size: 1.4rem; padding: 1.5rem 1rem; }
-    
+
     .modal-content {
         width: 95% !important;
         padding: 2rem 1rem;
@@ -455,14 +468,14 @@ body, .app-container, .main-content {
         max-height: 90vh;
         margin: 0 auto;
     }
-    
+
     .admin-grid { display: flex; flex-direction: column; width: 100%; gap: 1.5rem; padding: 0; }
     .admin-form, .admin-table-container { width: 100% !important; margin: 0 !important; padding: 1.5rem 1rem !important; }
     .admin-form .form-group.row { flex-direction: column; gap: 0.8rem; }
     .inventory-table tr { padding: 1rem; margin-bottom: 1rem; border-radius: 0; }
     .inventory-table td { padding: 0.8rem 0; font-size: 0.9rem; }
     .edit-input { width: 80px; }
-    
+
     .sales-summary-cards { grid-template-columns: 1fr; gap: 1rem; }
     .sales-controls { padding: 1rem; flex-direction: column; align-items: stretch; }
     .date-pickers { flex-direction: column; align-items: stretch; }
