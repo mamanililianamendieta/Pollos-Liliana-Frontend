@@ -218,6 +218,7 @@ body, .app-container, .main-content {
 .search-box { position: relative; width: 100%; max-width: 400px; }
 .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
 
+#search-input { width: 100%; padding: 0.9rem 1.5rem 0.9rem 2.8rem; border: 1px solid #ddd; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; background: white; transition: all 0.3s; }
 #search-input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(211, 47, 47, 0.2); }
 .custom-select { padding: 0.9rem 1.5rem; border: 1px solid #ddd; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; background: white; cursor: pointer; min-width: 200px; }
 
